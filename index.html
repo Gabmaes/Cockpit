@@ -1,282 +1,314 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="JH Cockpit" />
-<meta name="theme-color" content="#0a0a0a" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="JH Cockpit"/>
+<meta name="theme-color" content="#0a0a0a"/>
 <title>JH Strategy Cockpit</title>
-<!-- Icône App (monogramme JH inline en SVG, encodé en data URI pour fonctionner sans fichier externe) -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%231A1A1A'/%3E%3Ctext x='256' y='340' font-family='Georgia,serif' font-size='260' font-style='italic' font-weight='400' fill='%23FAF8F4' text-anchor='middle' letter-spacing='-8'%3EJH%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%231A1A1A'/%3E%3Ctext x='256' y='340' font-family='Georgia,serif' font-size='260' font-style='italic' font-weight='400' fill='%23FAF8F4' text-anchor='middle' letter-spacing='-8'%3EJH%3C/text%3E%3C/svg%3E">
-<link rel="manifest" href='data:application/manifest+json,{"name":"JH Strategy Cockpit","short_name":"JH Cockpit","description":"Suivi des streams stratégiques","start_url":".","display":"standalone","background_color":"%23FAF8F4","theme_color":"%231A1A1A","orientation":"portrait","icons":[{"src":"data:image/svg%2Bxml;utf8,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 512 512%27%3E%3Crect width=%27512%27 height=%27512%27 rx=%27112%27 fill=%27%231A1A1A%27/%3E%3Ctext x=%27256%27 y=%27340%27 font-family=%27Georgia,serif%27 font-size=%27260%27 font-style=%27italic%27 font-weight=%27400%27 fill=%27%23FAF8F4%27 text-anchor=%27middle%27 letter-spacing=%27-8%27%3EJH%3C/text%3E%3C/svg%3E","sizes":"any","type":"image/svg+xml"}]}'>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-:root {
-  --bg: #FAF8F4; --bg-card: #FFFFFF; --bg-soft: #F2EFE8;
-  --ink: #1A1A1A; --ink-soft: #5C5C5A; --ink-mute: #8E8C86;
-  --line: rgba(26,26,26,0.08); --line-strong: rgba(26,26,26,0.16);
-  --green: #4A7C2A; --green-bg: #E8F0DA;
-  --amber: #B07914; --amber-bg: #FAEFD7;
-  --red: #A02828; --red-bg: #FBE4E2;
-  --shadow: 0 1px 2px rgba(26,26,26,0.04), 0 4px 12px rgba(26,26,26,0.03);
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#FAF8F4;--bg-card:#FFFFFF;--bg-soft:#F2EFE8;--bg-deep:#EAE7E0;
+  --ink:#1A1A1A;--ink-soft:#5C5C5A;--ink-mute:#8E8C86;
+  --line:rgba(26,26,26,0.08);--line-strong:rgba(26,26,26,0.16);
+  --green:#4A7C2A;--green-bg:#E8F0DA;
+  --amber:#B07914;--amber-bg:#FAEFD7;
+  --red:#A02828;--red-bg:#FBE4E2;
+  --blue:#1A5FAB;--blue-bg:#E0EEFA;
+  --shadow:0 1px 2px rgba(26,26,26,0.04),0 4px 12px rgba(26,26,26,0.03);
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0E0E0C; --bg-card: #1A1A18; --bg-soft: #232320;
-    --ink: #F4F1EA; --ink-soft: #B5B2AA; --ink-mute: #7A7872;
-    --line: rgba(244,241,234,0.10); --line-strong: rgba(244,241,234,0.20);
-    --green: #9BC470; --green-bg: #2A3A1C;
-    --amber: #E0A845; --amber-bg: #3D2E12;
-    --red: #E08585; --red-bg: #3D1F1F;
-  }
-}
-html, body { background: var(--bg); color: var(--ink); font-family: 'Inter', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
-body { max-width: 480px; margin: 0 auto; min-height: 100vh; padding: env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 80px); }
+@media(prefers-color-scheme:dark){:root{
+  --bg:#0E0E0C;--bg-card:#1A1A18;--bg-soft:#232320;--bg-deep:#2A2A27;
+  --ink:#F4F1EA;--ink-soft:#B5B2AA;--ink-mute:#7A7872;
+  --line:rgba(244,241,234,0.10);--line-strong:rgba(244,241,234,0.20);
+  --green:#9BC470;--green-bg:#2A3A1C;
+  --amber:#E0A845;--amber-bg:#3D2E12;
+  --red:#E08585;--red-bg:#3D1F1F;
+  --blue:#6EA8E8;--blue-bg:#1A2A40;
+}}
+html,body{background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,sans-serif;-webkit-font-smoothing:antialiased}
+body{max-width:480px;margin:0 auto;min-height:100vh;padding:env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom)+80px)}
 
-.loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; gap: 16px; }
-.spinner { width: 24px; height: 24px; border: 2px solid var(--line); border-top-color: var(--ink); border-radius: 50%; animation: spin 0.7s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-text { font-size: 12px; color: var(--ink-mute); letter-spacing: 0.05em; text-transform: uppercase; }
+/* Loading */
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:80vh;gap:16px}
+.spinner{width:24px;height:24px;border:2px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:12px;color:var(--ink-mute);letter-spacing:.05em;text-transform:uppercase}
 
-.live-indicator { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; color: var(--green); letter-spacing: 0.05em; text-transform: uppercase; font-weight: 500; }
-.live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-.live-indicator.offline { color: var(--red); }
-.live-indicator.offline .live-dot { background: var(--red); animation: none; }
+/* Header */
+.live-indicator{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--green);letter-spacing:.05em;text-transform:uppercase;font-weight:500}
+.live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.live-indicator.offline{color:var(--red)}.live-indicator.offline .live-dot{background:var(--red);animation:none}
+.header{padding:20px 20px 16px;border-bottom:.5px solid var(--line);background:var(--bg);position:sticky;top:0;z-index:20;backdrop-filter:saturate(180%) blur(12px);-webkit-backdrop-filter:saturate(180%) blur(12px)}
+.header-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px;gap:8px}
+.brand{font-family:'Fraunces',serif;font-weight:400;font-size:22px;letter-spacing:-.01em}
+.brand em{font-style:italic;font-weight:300}
+.header-right{display:flex;align-items:center;gap:8px}
+.update{font-size:11px;color:var(--ink-mute);letter-spacing:.04em;text-transform:uppercase}
+.subtitle{font-size:12px;color:var(--ink-soft);display:flex;justify-content:space-between;align-items:center}
+.gear-btn{background:transparent;border:.5px solid var(--line);border-radius:8px;width:28px;height:28px;cursor:pointer;color:var(--ink-mute);display:flex;align-items:center;justify-content:center;transition:all .15s;padding:0}
+.gear-btn:hover{color:var(--ink);border-color:var(--ink);background:var(--bg-soft)}
+.gear-btn svg{width:14px;height:14px}
+body.edit-mode .gear-btn{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+body.edit-mode .edit-indicator{display:inline-flex!important}
+.edit-indicator{display:none;align-items:center;gap:5px;font-size:10px;color:var(--amber);letter-spacing:.05em;text-transform:uppercase;font-weight:600}
+.edit-indicator-dot{width:6px;height:6px;background:var(--amber);border-radius:50%}
 
-.header { padding: 20px 20px 16px; border-bottom: 0.5px solid var(--line); background: var(--bg); position: sticky; top: 0; z-index: 10; backdrop-filter: saturate(180%) blur(12px); -webkit-backdrop-filter: saturate(180%) blur(12px); }
-.header-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; gap: 8px; }
-.brand { font-family: 'Fraunces', serif; font-weight: 400; font-size: 22px; letter-spacing: -0.01em; }
-.brand em { font-style: italic; font-weight: 300; }
-.header-right { display: flex; align-items: center; gap: 10px; }
-.update { font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; text-transform: uppercase; }
-.subtitle { font-size: 12px; color: var(--ink-soft); display: flex; justify-content: space-between; align-items: center; }
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-top:.5px solid var(--line)}
+.stat{background:var(--bg);padding:14px 16px}
+.stat-num{font-family:'Fraunces',serif;font-size:28px;font-weight:400;line-height:1}
+.stat-num.alert{color:var(--red)}.stat-num.warn{color:var(--amber)}
+.stat-label{font-size:10px;color:var(--ink-mute);letter-spacing:.06em;text-transform:uppercase;margin-top:4px}
 
-.gear-btn { background: transparent; border: 0.5px solid var(--line); border-radius: 8px; width: 28px; height: 28px; cursor: pointer; color: var(--ink-mute); display: flex; align-items: center; justify-content: center; transition: all 0.15s; padding: 0; }
-.gear-btn:hover { color: var(--ink); border-color: var(--ink); background: var(--bg-soft); }
-.gear-btn svg { width: 14px; height: 14px; }
-body.edit-mode .gear-btn { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-body.edit-mode .edit-indicator { display: inline-flex !important; }
+/* Tabs */
+nav.tabs{display:flex;background:var(--bg);border-bottom:.5px solid var(--line);overflow-x:auto;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;min-width:max-content;background:transparent;border:none;padding:14px 16px;font-family:inherit;font-size:13px;font-weight:500;color:var(--ink-mute);cursor:pointer;position:relative;white-space:nowrap;transition:color .2s}
+.tab.active{color:var(--ink)}
+.tab.active::after{content:'';position:absolute;bottom:-.5px;left:16px;right:16px;height:2px;background:var(--ink)}
+.tab .badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;font-size:10px;font-weight:600;background:var(--red-bg);color:var(--red);border-radius:9px;margin-left:4px}
 
-.edit-indicator { display: none; align-items: center; gap: 5px; font-size: 10px; color: var(--amber); letter-spacing: 0.05em; text-transform: uppercase; font-weight: 600; }
-.edit-indicator-dot { width: 6px; height: 6px; background: var(--amber); border-radius: 50%; }
+/* Panels */
+.content{padding:16px 20px}
+.panel{display:none}
+.panel.active{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.section-head{display:flex;align-items:baseline;justify-content:space-between;margin:24px 0 10px}
+.section-head:first-child{margin-top:4px}
+.section-title{font-family:'Fraunces',serif;font-size:14px;font-weight:500;letter-spacing:.02em;text-transform:uppercase}
+.section-count{font-size:11px;color:var(--ink-mute)}
 
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border-top: 0.5px solid var(--line); }
-.stat { background: var(--bg); padding: 14px 16px; }
-.stat-num { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 400; line-height: 1; }
-.stat-num.alert { color: var(--red); }
-.stat-num.warn { color: var(--amber); }
-.stat-label { font-size: 10px; color: var(--ink-mute); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; }
+/* ====== STREAM PARENT (conteneur) ====== */
+.stream-container{margin-bottom:10px;border-radius:14px;overflow:hidden;border:.5px solid var(--line);background:var(--bg-card);box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s;position:relative}
+.stream-container.drag-over{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}
+.stream-container.dragging{opacity:.5;border-style:dashed}
+.stream-header{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;user-select:none;position:relative}
+body.edit-mode .stream-header{padding-right:50px}
+.drag-handle{display:none;width:20px;height:20px;cursor:grab;color:var(--ink-mute);flex-shrink:0;align-items:center;justify-content:center;touch-action:none}
+.drag-handle:active{cursor:grabbing}
+body.edit-mode .drag-handle{display:flex}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot.green{background:var(--green);box-shadow:0 0 0 3px var(--green-bg)}
+.dot.amber{background:var(--amber);box-shadow:0 0 0 3px var(--amber-bg)}
+.dot.red{background:var(--red);box-shadow:0 0 0 3px var(--red-bg)}
+.stream-name{flex:1;font-size:15px;font-weight:500;letter-spacing:-.01em}
+.stream-meta-row{display:flex;align-items:center;gap:6px}
+.staffing-badge{font-size:10px;color:var(--ink-soft);background:var(--bg-soft);padding:3px 7px;border-radius:6px;letter-spacing:.03em;font-weight:500}
+.substream-count{font-size:10px;color:var(--ink-mute);background:var(--bg-soft);padding:3px 7px;border-radius:6px;font-variant-numeric:tabular-nums}
+.chevron{width:10px;height:10px;border-right:1.5px solid var(--ink-mute);border-bottom:1.5px solid var(--ink-mute);transform:rotate(45deg);margin-left:2px;margin-bottom:4px;transition:transform .25s ease;flex-shrink:0}
+.stream-container.open>.stream-header .chevron{transform:rotate(-135deg);margin-bottom:-4px}
 
-nav.tabs { display: flex; background: var(--bg); border-bottom: 0.5px solid var(--line); overflow-x: auto; scrollbar-width: none; }
-nav.tabs::-webkit-scrollbar { display: none; }
-.tab { flex: 1; min-width: max-content; background: transparent; border: none; padding: 14px 16px; font-family: inherit; font-size: 13px; font-weight: 500; color: var(--ink-mute); cursor: pointer; position: relative; white-space: nowrap; transition: color 0.2s; }
-.tab.active { color: var(--ink); }
-.tab.active::after { content: ''; position: absolute; bottom: -0.5px; left: 16px; right: 16px; height: 2px; background: var(--ink); }
-.tab .badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; font-size: 10px; font-weight: 600; background: var(--red-bg); color: var(--red); border-radius: 9px; margin-left: 4px; }
+/* Sub-streams container */
+.substreams-wrapper{display:none;border-top:.5px solid var(--line)}
+.stream-container.open>.substreams-wrapper{display:block}
 
-.content { padding: 16px 20px; }
-.panel { display: none; }
-.panel.active { display: block; animation: fadeIn 0.25s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+/* ====== SUBSTREAM ====== */
+.substream{border-bottom:.5px solid var(--line);position:relative}
+.substream:last-child{border-bottom:none}
+.substream-head{display:flex;align-items:center;gap:10px;padding:12px 16px 12px 24px;cursor:pointer;user-select:none}
+body.edit-mode .substream-head{padding-right:50px}
+.substream-name{flex:1;font-size:14px;font-weight:500;color:var(--ink)}
+.substream-chevron{width:8px;height:8px;border-right:1.5px solid var(--ink-mute);border-bottom:1.5px solid var(--ink-mute);transform:rotate(45deg);margin-bottom:3px;transition:transform .2s;flex-shrink:0}
+.substream.open .substream-chevron{transform:rotate(-135deg);margin-bottom:-2px}
+.substream-preview{padding:0 16px 10px 24px;font-size:12px;color:var(--ink-mute);display:flex;align-items:center;gap:6px}
+.substream.open .substream-preview{display:none}
+.substream-body{display:none;padding:0 16px 14px 24px;background:var(--bg-soft)}
+.substream.open .substream-body{display:block;animation:fadeIn .2s ease}
 
-.section-head { display: flex; align-items: baseline; justify-content: space-between; margin: 24px 0 10px; }
-.section-head:first-child { margin-top: 4px; }
-.section-title { font-family: 'Fraunces', serif; font-size: 14px; font-weight: 500; letter-spacing: 0.02em; text-transform: uppercase; }
-.section-count { font-size: 11px; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
+/* Substream content blocks */
+.content-block{margin-bottom:12px}
+.content-block:last-child{margin-bottom:0}
+.block-label{font-size:10px;color:var(--ink-mute);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;font-weight:600;padding-top:12px;display:block}
+.block-label:first-child{padding-top:0}
 
-.card { background: var(--bg-card); border: 0.5px solid var(--line); border-radius: 14px; margin-bottom: 8px; overflow: hidden; transition: border-color 0.2s; box-shadow: var(--shadow); position: relative; }
-.card.open { border-color: var(--line-strong); }
-.card-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; user-select: none; }
-body.edit-mode .card-head { padding-right: 50px; }
-.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.dot.green { background: var(--green); box-shadow: 0 0 0 3px var(--green-bg); }
-.dot.amber { background: var(--amber); box-shadow: 0 0 0 3px var(--amber-bg); }
-.dot.red { background: var(--red); box-shadow: 0 0 0 3px var(--red-bg); }
-.card-name { flex: 1; font-size: 15px; font-weight: 500; letter-spacing: -0.01em; }
-.staffing { font-size: 10px; color: var(--ink-soft); background: var(--bg-soft); padding: 3px 7px; border-radius: 6px; letter-spacing: 0.03em; font-weight: 500; }
-.chevron { width: 10px; height: 10px; border-right: 1.5px solid var(--ink-mute); border-bottom: 1.5px solid var(--ink-mute); transform: rotate(45deg); margin-left: 2px; margin-bottom: 4px; transition: transform 0.25s ease; }
-.card.open .chevron { transform: rotate(-135deg); margin-bottom: -4px; }
-.card-meta { padding: 0 16px 12px 34px; font-size: 12px; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; }
-.card-meta .date { color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; }
+/* Update box */
+.update-box{background:var(--bg-card);border:.5px solid var(--line);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--ink);line-height:1.5}
+.update-box.empty{color:var(--ink-mute);font-style:italic}
 
-.card-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
-.card.open .card-body { max-height: 800px; }
-.card-body-inner { padding: 14px 16px 16px 34px; border-top: 0.5px solid var(--line); }
-.block { margin-bottom: 14px; }
-.block:last-child { margin-bottom: 0; }
-.block-label { font-size: 10px; color: var(--ink-mute); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; font-weight: 600; }
-.list { list-style: none; }
-.list li { font-size: 13px; line-height: 1.55; color: var(--ink); padding: 4px 0 4px 14px; position: relative; }
-.list li::before { content: ''; position: absolute; left: 0; top: 12px; width: 5px; height: 1px; background: var(--ink-mute); }
-.list.dates li { padding: 4px 0; display: flex; gap: 10px; }
-.list.dates li::before { display: none; }
-.list.dates .date { font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; min-width: 60px; font-size: 12px; }
-.list.dates .label { font-size: 13px; color: var(--ink-soft); flex: 1; }
-.arb-inline { background: var(--amber-bg); border-radius: 8px; padding: 8px 10px; font-size: 12px; color: var(--amber); line-height: 1.45; font-weight: 500; }
+/* Next steps */
+.ns-list{list-style:none}
+.ns-list li{font-size:13px;line-height:1.55;color:var(--ink);padding:3px 0 3px 14px;position:relative}
+.ns-list li::before{content:'';position:absolute;left:0;top:11px;width:5px;height:1px;background:var(--ink-mute)}
 
-.meeting-card { background: var(--bg-card); border: 0.5px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow); position: relative; }
-.meeting-card.featured { border-color: var(--ink); }
-.meeting-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 0.5px solid var(--line); }
-.meeting-date-badge { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 500; letter-spacing: -0.01em; line-height: 1; }
-.meeting-title-text { font-size: 13px; color: var(--ink-soft); flex: 1; }
-.agenda-item { padding: 10px 0; border-bottom: 0.5px solid var(--line); }
-.agenda-item:last-child { border-bottom: none; padding-bottom: 0; }
-.agenda-item:first-child { padding-top: 0; }
-.agenda-row { display: flex; align-items: flex-start; gap: 10px; }
-.agenda-time { font-size: 11px; color: var(--ink-mute); font-variant-numeric: tabular-nums; min-width: 60px; padding-top: 1px; letter-spacing: 0.02em; }
-.agenda-body { flex: 1; }
-.agenda-topic { font-size: 13px; font-weight: 500; line-height: 1.4; color: var(--ink); }
-.agenda-owners { font-size: 11px; color: var(--ink-mute); margin-top: 3px; line-height: 1.35; }
-.prep-flag { display: inline-block; font-size: 9.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; background: var(--amber-bg); color: var(--amber); padding: 2px 6px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
-.agenda-item.prep .agenda-topic::before { content: ''; display: inline-block; width: 3px; height: 3px; background: var(--amber); border-radius: 50%; margin-right: 6px; vertical-align: middle; margin-bottom: 2px; }
+/* Dates */
+.dates-list{list-style:none}
+.dates-list li{display:flex;gap:10px;padding:3px 0;font-size:13px}
+.dates-list .date{font-weight:500;color:var(--ink);min-width:60px;font-size:12px;font-variant-numeric:tabular-nums}
+.dates-list .label{color:var(--ink-soft);flex:1}
 
-.timeline-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--bg-card); border: 0.5px solid var(--line); border-radius: 12px; margin-bottom: 6px; position: relative; }
-.timeline-date-block { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 500; color: var(--ink); min-width: 56px; letter-spacing: -0.01em; }
-.timeline-label { font-size: 13px; color: var(--ink-soft); flex: 1; line-height: 1.3; }
+/* Arb */
+.arb-box{background:var(--amber-bg);border-radius:8px;padding:8px 10px;font-size:12px;color:var(--amber);line-height:1.45;font-weight:500}
 
-.arb-card { background: var(--bg-card); border: 0.5px solid var(--line); border-left: 3px solid var(--amber); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; position: relative; }
-body.edit-mode .arb-card { padding-right: 50px; }
-.arb-stream-name { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 4px; }
-.arb-question { font-size: 14px; color: var(--ink); line-height: 1.45; font-weight: 500; }
+/* Docs */
+.docs-list{display:flex;flex-direction:column;gap:6px}
+.doc-item{display:flex;align-items:center;gap:10px;background:var(--bg-card);border:.5px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;transition:border-color .15s}
+.doc-item:hover{border-color:var(--ink)}
+.doc-icon{width:28px;height:28px;background:var(--blue-bg);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.doc-icon svg{width:14px;height:14px;color:var(--blue)}
+.doc-info{flex:1;min-width:0}
+.doc-title{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-url{font-size:10px;color:var(--ink-mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-arrow{color:var(--ink-mute);flex-shrink:0}
+.doc-arrow svg{width:12px;height:12px}
 
-.edit-pencil { display: none; position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 8px; background: var(--bg-card); border: 0.5px solid var(--line-strong); color: var(--ink); cursor: pointer; align-items: center; justify-content: center; z-index: 5; box-shadow: var(--shadow); padding: 0; }
-body.edit-mode .edit-pencil { display: flex; }
-.edit-pencil:hover { background: var(--ink); color: var(--bg); }
-.edit-pencil:active { transform: scale(0.95); }
-.edit-pencil svg { width: 14px; height: 14px; }
+/* No content */
+.no-content{font-size:12px;color:var(--ink-mute);font-style:italic;padding:4px 0}
 
-.add-btn { display: none; width: 100%; padding: 14px; border: 1.5px dashed var(--line-strong); background: transparent; color: var(--ink-soft); border-radius: 12px; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; margin-top: 8px; transition: all 0.15s; }
-body.edit-mode .add-btn { display: block; }
-.add-btn:hover { color: var(--ink); border-color: var(--ink); background: var(--bg-soft); }
+/* Edit buttons */
+.edit-pencil{display:none;position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:8px;background:var(--bg-card);border:.5px solid var(--line-strong);color:var(--ink);cursor:pointer;align-items:center;justify-content:center;z-index:5;box-shadow:var(--shadow);padding:0}
+body.edit-mode .edit-pencil{display:flex}
+.edit-pencil:hover{background:var(--ink);color:var(--bg)}
+.edit-pencil:active{transform:scale(.95)}
+.edit-pencil svg{width:14px;height:14px}
+.add-btn{display:none;width:100%;padding:14px;border:1.5px dashed var(--line-strong);background:transparent;color:var(--ink-soft);border-radius:12px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;margin-top:8px;transition:all .15s}
+body.edit-mode .add-btn{display:block}
+.add-btn:hover{color:var(--ink);border-color:var(--ink);background:var(--bg-soft)}
+.add-substream-btn{display:none;margin:8px 16px 12px 24px;padding:9px 12px;border:1px dashed var(--line-strong);background:transparent;color:var(--ink-mute);border-radius:8px;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;width:calc(100% - 40px)}
+body.edit-mode .add-substream-btn{display:block}
+.add-substream-btn:hover{color:var(--ink);border-color:var(--ink)}
 
-.empty { text-align: center; padding: 40px 20px; color: var(--ink-mute); font-size: 13px; }
-.error-screen { padding: 40px 20px; text-align: center; }
-.error-title { font-family: 'Fraunces', serif; font-size: 20px; margin-bottom: 8px; }
-.error-msg { font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
-.footer-note { text-align: center; font-size: 10px; color: var(--ink-mute); padding: 24px 20px 8px; letter-spacing: 0.05em; text-transform: uppercase; }
+/* ====== MEETING CARDS ====== */
+.meeting-card{background:var(--bg-card);border:.5px solid var(--ink);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow);position:relative}
+.meeting-head{display:flex;align-items:baseline;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:.5px solid var(--line)}
+.meeting-date-badge{font-family:'Fraunces',serif;font-size:20px;font-weight:500;letter-spacing:-.01em;line-height:1}
+.meeting-title-text{font-size:13px;color:var(--ink-soft);flex:1}
+.agenda-item{padding:10px 0;border-bottom:.5px solid var(--line)}
+.agenda-item:last-child{border-bottom:none;padding-bottom:0}
+.agenda-item:first-child{padding-top:0}
+.agenda-row{display:flex;align-items:flex-start;gap:10px}
+.agenda-time{font-size:11px;color:var(--ink-mute);min-width:60px;padding-top:1px;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.agenda-body{flex:1}
+.agenda-topic{font-size:13px;font-weight:500;line-height:1.4;color:var(--ink)}
+.agenda-owners{font-size:11px;color:var(--ink-mute);margin-top:3px;line-height:1.35}
+.prep-flag{display:inline-block;font-size:9.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:var(--amber-bg);color:var(--amber);padding:2px 6px;border-radius:4px;margin-left:6px;vertical-align:middle}
+.agenda-item.prep .agenda-topic::before{content:'';display:inline-block;width:3px;height:3px;background:var(--amber);border-radius:50%;margin-right:6px;vertical-align:middle;margin-bottom:2px}
+.timeline-item{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg-card);border:.5px solid var(--line);border-radius:12px;margin-bottom:6px;position:relative}
+.timeline-date-block{font-family:'Fraunces',serif;font-size:18px;font-weight:500;color:var(--ink);min-width:56px}
+.timeline-label{font-size:13px;color:var(--ink-soft);flex:1;line-height:1.3}
 
-/* MODALES */
-.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-.modal-backdrop.active { opacity: 1; pointer-events: auto; }
-.modal { position: fixed; inset: 0; background: var(--bg); z-index: 101; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; }
-.modal.active { transform: translateY(0); }
-.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 0.5px solid var(--line); padding-top: calc(16px + env(safe-area-inset-top)); }
-.modal-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 500; letter-spacing: -0.01em; }
-.modal-close { background: transparent; border: none; color: var(--ink); font-size: 28px; line-height: 1; cursor: pointer; padding: 4px 8px; font-weight: 300; }
-.modal-body { flex: 1; overflow-y: auto; padding: 20px; -webkit-overflow-scrolling: touch; }
-.modal-footer { border-top: 0.5px solid var(--line); padding: 14px 20px; padding-bottom: calc(14px + env(safe-area-inset-bottom)); display: flex; gap: 10px; background: var(--bg); }
+/* Arb panel */
+.arb-card{background:var(--bg-card);border:.5px solid var(--line);border-left:3px solid var(--amber);border-radius:10px;padding:12px 14px;margin-bottom:8px;position:relative}
+body.edit-mode .arb-card{padding-right:50px}
+.arb-stream-name{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-mute);margin-bottom:4px}
+.arb-question{font-size:14px;color:var(--ink);line-height:1.45;font-weight:500}
 
-.field { margin-bottom: 18px; }
-.field-label { font-size: 11px; color: var(--ink-mute); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; display: block; }
-.field input[type="text"], .field textarea, .field select { width: 100%; padding: 12px 14px; border: 0.5px solid var(--line-strong); border-radius: 10px; background: var(--bg-card); font-family: inherit; font-size: 15px; color: var(--ink); -webkit-appearance: none; }
-.field input:focus, .field textarea:focus, .field select:focus { outline: none; border-color: var(--ink); }
-.field textarea { min-height: 80px; resize: vertical; font-family: inherit; line-height: 1.5; }
+.empty{text-align:center;padding:40px 20px;color:var(--ink-mute);font-size:13px}
+.footer-note{text-align:center;font-size:10px;color:var(--ink-mute);padding:16px 20px 8px;letter-spacing:.05em;text-transform:uppercase}
 
-.status-pills { display: flex; gap: 6px; }
-.status-pill { flex: 1; padding: 12px 8px; border: 0.5px solid var(--line-strong); border-radius: 10px; background: var(--bg-card); cursor: pointer; text-align: center; font-size: 12px; font-weight: 500; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: all 0.15s; }
-.status-pill.selected { border-color: var(--ink); background: var(--bg-soft); }
-.status-pill .pill-dot { width: 10px; height: 10px; border-radius: 50%; }
-.status-pill .pill-dot.green { background: var(--green); }
-.status-pill .pill-dot.amber { background: var(--amber); }
-.status-pill .pill-dot.red { background: var(--red); }
+/* ====== INSTALL BAR ====== */
+.install-bar{display:flex;justify-content:center;padding:0 20px 20px}
+.install-btn-outer{display:inline-flex;align-items:center;gap:10px;background:var(--bg-card);color:var(--ink);border:.5px solid var(--line-strong);border-radius:12px;padding:12px 18px;font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;box-shadow:var(--shadow)}
+.install-btn-outer:hover{border-color:var(--ink);background:var(--bg-soft)}
+.install-icon-wrap{width:28px;height:28px;flex-shrink:0;border-radius:7px;overflow:hidden}
+.install-text{display:flex;flex-direction:column;align-items:flex-start;gap:1px}
+.install-title-text{font-size:13px;font-weight:600;line-height:1.2}
+.install-sub-text{font-size:10px;color:var(--ink-mute);letter-spacing:.03em}
+@media(display-mode:standalone){.install-bar{display:none}}
 
-.subitems { margin-top: 4px; }
-.subitem { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
-.subitem input { flex: 1; padding: 10px 12px; border: 0.5px solid var(--line-strong); border-radius: 8px; background: var(--bg-card); font-family: inherit; font-size: 14px; color: var(--ink); -webkit-appearance: none; min-width: 0; }
-.subitem input.date-input { flex: 0 0 80px; }
-.subitem input.time-input { flex: 0 0 110px; }
-.subitem .remove-btn { background: transparent; border: 0.5px solid var(--line-strong); border-radius: 8px; width: 34px; height: 34px; cursor: pointer; color: var(--ink-mute); font-size: 18px; flex-shrink: 0; line-height: 1; }
-.subitem .remove-btn:hover { color: var(--red); border-color: var(--red); }
-.subitem-row-wrap { flex-wrap: wrap; }
-.subitem-row-wrap .meta-row { flex-basis: 100%; display: flex; gap: 6px; align-items: center; margin-top: 4px; }
-.checkbox-pill { display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; background: var(--bg-soft); border-radius: 6px; font-size: 12px; color: var(--ink-soft); cursor: pointer; white-space: nowrap; }
-.checkbox-pill input { margin: 0; }
+/* ====== MODALS ====== */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.modal-backdrop.active{opacity:1;pointer-events:auto}
+.modal{position:fixed;inset:0;background:var(--bg);z-index:101;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);display:flex;flex-direction:column;max-width:480px;margin:0 auto}
+.modal.active{transform:translateY(0)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:.5px solid var(--line);padding-top:calc(16px + env(safe-area-inset-top))}
+.modal-title{font-family:'Fraunces',serif;font-size:18px;font-weight:500;letter-spacing:-.01em}
+.modal-close{background:transparent;border:none;color:var(--ink);font-size:28px;line-height:1;cursor:pointer;padding:4px 8px;font-weight:300}
+.modal-body{flex:1;overflow-y:auto;padding:20px;-webkit-overflow-scrolling:touch}
+.modal-footer{border-top:.5px solid var(--line);padding:14px 20px;padding-bottom:calc(14px + env(safe-area-inset-bottom));display:flex;gap:10px;background:var(--bg)}
 
-.add-subitem { background: transparent; color: var(--ink-soft); border: 1px dashed var(--line-strong); padding: 10px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 12px; width: 100%; margin-top: 4px; }
-.add-subitem:hover { color: var(--ink); border-color: var(--ink); }
+/* Form fields */
+.field{margin-bottom:18px}
+.field-label{font-size:11px;color:var(--ink-mute);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;display:block}
+.field input[type="text"],.field textarea,.field select{width:100%;padding:12px 14px;border:.5px solid var(--line-strong);border-radius:10px;background:var(--bg-card);font-family:inherit;font-size:15px;color:var(--ink);-webkit-appearance:none}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--ink)}
+.field textarea{min-height:80px;resize:vertical;font-family:inherit;line-height:1.5}
+.status-pills{display:flex;gap:6px}
+.status-pill{flex:1;padding:12px 8px;border:.5px solid var(--line-strong);border-radius:10px;background:var(--bg-card);cursor:pointer;text-align:center;font-size:12px;font-weight:500;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .15s}
+.status-pill.selected{border-color:var(--ink);background:var(--bg-soft)}
+.status-pill .pill-dot{width:10px;height:10px;border-radius:50%}
+.status-pill .pill-dot.green{background:var(--green)}
+.status-pill .pill-dot.amber{background:var(--amber)}
+.status-pill .pill-dot.red{background:var(--red)}
+.subitems{margin-top:4px}
+.subitem{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+.subitem input{flex:1;padding:10px 12px;border:.5px solid var(--line-strong);border-radius:8px;background:var(--bg-card);font-family:inherit;font-size:14px;color:var(--ink);-webkit-appearance:none;min-width:0}
+.subitem input.date-input{flex:0 0 80px}
+.subitem .remove-btn{background:transparent;border:.5px solid var(--line-strong);border-radius:8px;width:34px;height:34px;cursor:pointer;color:var(--ink-mute);font-size:18px;flex-shrink:0;line-height:1}
+.subitem .remove-btn:hover{color:var(--red);border-color:var(--red)}
+.subitem-row-wrap{flex-wrap:wrap}
+.subitem-row-wrap .meta-row{flex-basis:100%;display:flex;gap:6px;align-items:center;margin-top:4px}
+.checkbox-pill{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;background:var(--bg-soft);border-radius:6px;font-size:12px;color:var(--ink-soft);cursor:pointer;white-space:nowrap}
+.checkbox-pill input{margin:0}
+.add-subitem{background:transparent;color:var(--ink-soft);border:1px dashed var(--line-strong);padding:10px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:12px;width:100%;margin-top:4px}
+.add-subitem:hover{color:var(--ink);border-color:var(--ink)}
+.btn{padding:12px 18px;border-radius:10px;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .15s}
+.btn-primary{background:var(--ink);color:var(--bg);flex:1}
+.btn-primary:active{opacity:.7}
+.btn-secondary{background:var(--bg-card);color:var(--ink);border:.5px solid var(--line-strong)}
+.btn-danger{background:transparent;color:var(--red);border:.5px solid var(--red)}
+.btn-danger:hover{background:var(--red);color:var(--bg)}
 
-.btn { padding: 12px 18px; border-radius: 10px; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; }
-.btn-primary { background: var(--ink); color: var(--bg); flex: 1; }
-.btn-primary:active { opacity: 0.7; }
-.btn-secondary { background: var(--bg-card); color: var(--ink); border: 0.5px solid var(--line-strong); }
-.btn-danger { background: transparent; color: var(--red); border: 0.5px solid var(--red); }
-.btn-danger:hover { background: var(--red); color: var(--bg); }
+/* Section divider inside modal */
+.modal-section-divider{font-family:'Fraunces',serif;font-size:14px;font-weight:500;color:var(--ink);margin:20px 0 12px;padding-bottom:8px;border-bottom:.5px solid var(--line);letter-spacing:.02em;text-transform:uppercase}
 
-.confirm-modal { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-.confirm-modal.active { display: flex; }
-.confirm-box { background: var(--bg-card); border-radius: 16px; padding: 24px; max-width: 320px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
-.confirm-title { font-family: 'Fraunces', serif; font-size: 18px; margin-bottom: 8px; font-weight: 500; }
-.confirm-msg { font-size: 13px; color: var(--ink-soft); line-height: 1.5; margin-bottom: 20px; }
-.confirm-actions { display: flex; gap: 8px; }
-.confirm-actions .btn { flex: 1; padding: 10px 14px; }
+/* Doc form row */
+.doc-form-row{background:var(--bg-soft);border-radius:10px;padding:12px;margin-bottom:8px;position:relative}
+.doc-form-row .remove-doc-btn{position:absolute;top:8px;right:8px;background:transparent;border:.5px solid var(--line-strong);border-radius:6px;width:26px;height:26px;cursor:pointer;color:var(--ink-mute);font-size:16px;line-height:1}
+.doc-form-row .remove-doc-btn:hover{color:var(--red);border-color:var(--red)}
+.doc-form-row .field{margin-bottom:8px}
+.doc-form-row .field:last-child{margin-bottom:0}
+.doc-form-row .field input{font-size:13px;padding:9px 12px}
 
-.pw-modal { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-.pw-modal.active { display: flex; }
-.pw-box { background: var(--bg-card); border-radius: 16px; padding: 24px; max-width: 320px; width: 100%; }
-.pw-title { font-family: 'Fraunces', serif; font-size: 18px; margin-bottom: 6px; font-weight: 500; }
-.pw-msg { font-size: 12px; color: var(--ink-soft); margin-bottom: 16px; line-height: 1.5; }
-.pw-input { width: 100%; padding: 12px 14px; border: 0.5px solid var(--line-strong); border-radius: 10px; background: var(--bg); font-family: inherit; font-size: 15px; color: var(--ink); margin-bottom: 8px; -webkit-appearance: none; }
-.pw-input:focus { outline: none; border-color: var(--ink); }
-.pw-error { color: var(--red); font-size: 12px; min-height: 16px; margin-bottom: 8px; }
+/* Confirm / PW modals */
+.confirm-modal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.confirm-modal.active{display:flex}
+.confirm-box{background:var(--bg-card);border-radius:16px;padding:24px;max-width:320px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.confirm-title{font-family:'Fraunces',serif;font-size:18px;margin-bottom:8px;font-weight:500}
+.confirm-msg{font-size:13px;color:var(--ink-soft);line-height:1.5;margin-bottom:20px}
+.confirm-actions{display:flex;gap:8px}
+.confirm-actions .btn{flex:1;padding:10px 14px}
+.pw-modal{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.pw-modal.active{display:flex}
+.pw-box{background:var(--bg-card);border-radius:16px;padding:24px;max-width:320px;width:100%}
+.pw-title{font-family:'Fraunces',serif;font-size:18px;margin-bottom:6px;font-weight:500}
+.pw-msg{font-size:12px;color:var(--ink-soft);margin-bottom:16px;line-height:1.5}
+.pw-input{width:100%;padding:12px 14px;border:.5px solid var(--line-strong);border-radius:10px;background:var(--bg);font-family:inherit;font-size:15px;color:var(--ink);margin-bottom:8px;-webkit-appearance:none}
+.pw-input:focus{outline:none;border-color:var(--ink)}
+.pw-error{color:var(--red);font-size:12px;min-height:16px;margin-bottom:8px}
 
-.toast { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%) translateY(100px); background: var(--ink); color: var(--bg); padding: 12px 20px; border-radius: 24px; font-size: 13px; font-weight: 500; z-index: 300; transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-.toast.active { transform: translateX(-50%) translateY(0); }
+/* Doc preview modal */
+.doc-preview-modal{position:fixed;inset:0;z-index:150;display:none;flex-direction:column;background:var(--bg);max-width:480px;margin:0 auto}
+.doc-preview-modal.active{display:flex}
+.doc-preview-header{display:flex;align-items:center;gap:10px;padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top));border-bottom:.5px solid var(--line);background:var(--bg)}
+.doc-preview-title{flex:1;font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-preview-actions{display:flex;gap:6px}
+.doc-preview-btn{background:transparent;border:.5px solid var(--line-strong);border-radius:8px;padding:7px 12px;font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;color:var(--ink);display:flex;align-items:center;gap:5px}
+.doc-preview-btn:hover{background:var(--bg-soft)}
+.doc-preview-frame{flex:1;border:none;background:var(--bg-soft)}
+.doc-preview-fallback{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px 20px;text-align:center}
+.doc-preview-fallback-icon{width:56px;height:56px;background:var(--blue-bg);border-radius:14px;display:flex;align-items:center;justify-content:center}
+.doc-preview-fallback-icon svg{width:28px;height:28px;color:var(--blue)}
+.doc-preview-fallback-title{font-family:'Fraunces',serif;font-size:18px;font-weight:400}
+.doc-preview-fallback-msg{font-size:13px;color:var(--ink-soft);line-height:1.5;max-width:280px}
+.doc-preview-open-btn{background:var(--ink);color:var(--bg);border:none;border-radius:10px;padding:12px 24px;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer}
 
-/* Install button + modal */
-.install-bar { display: flex; justify-content: center; padding: 0 20px 20px; }
-.install-btn { display: inline-flex; align-items: center; gap: 10px; background: var(--bg-card); color: var(--ink); border: 0.5px solid var(--line-strong); border-radius: 12px; padding: 12px 18px; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow); }
-.install-btn:hover { border-color: var(--ink); background: var(--bg-soft); }
-.install-btn:active { transform: scale(0.98); }
-.install-btn .install-icon { width: 28px; height: 28px; flex-shrink: 0; border-radius: 7px; overflow: hidden; }
-.install-btn .install-text { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
-.install-btn .install-title { font-size: 13px; font-weight: 600; line-height: 1.2; }
-.install-btn .install-sub { font-size: 10px; color: var(--ink-mute); letter-spacing: 0.03em; }
-.install-btn.hidden { display: none; }
+/* Toast */
+.toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:24px;font-size:13px;font-weight:500;z-index:400;transition:transform .3s cubic-bezier(.32,.72,0,1);box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.toast.active{transform:translateX(-50%) translateY(0)}
 
-/* If app already installed (PWA standalone mode), hide the button */
-@media (display-mode: standalone) { .install-bar { display: none; } }
-
-.install-modal { position: fixed; inset: 0; z-index: 200; display: none; align-items: flex-end; justify-content: center; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); padding: 0; }
-.install-modal.active { display: flex; animation: fadeIn 0.2s ease; }
-.install-sheet { background: var(--bg); border-radius: 20px 20px 0 0; padding: 24px 20px; padding-bottom: calc(24px + env(safe-area-inset-bottom)); max-width: 480px; width: 100%; box-shadow: 0 -10px 40px rgba(0,0,0,0.2); animation: slideUp 0.3s cubic-bezier(0.32, 0.72, 0, 1); max-height: 85vh; overflow-y: auto; }
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-.install-sheet-handle { width: 36px; height: 4px; background: var(--line-strong); border-radius: 2px; margin: 0 auto 18px; }
-.install-hero { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 22px; }
-.install-hero-icon { width: 72px; height: 72px; border-radius: 18px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
-.install-hero-title { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 400; letter-spacing: -0.01em; text-align: center; }
-.install-hero-title em { font-style: italic; font-weight: 300; }
-.install-hero-sub { font-size: 12px; color: var(--ink-soft); text-align: center; max-width: 280px; line-height: 1.4; }
-
-.platform-tabs { display: flex; gap: 4px; background: var(--bg-soft); padding: 4px; border-radius: 10px; margin-bottom: 20px; }
-.platform-tab { flex: 1; padding: 10px 8px; border: none; background: transparent; font-family: inherit; font-size: 12px; font-weight: 500; color: var(--ink-mute); cursor: pointer; border-radius: 7px; transition: all 0.15s; }
-.platform-tab.active { background: var(--bg-card); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-
-.install-steps { display: none; }
-.install-steps.active { display: block; animation: fadeIn 0.2s; }
-.step { display: flex; gap: 12px; padding: 12px 0; border-bottom: 0.5px solid var(--line); }
-.step:last-child { border-bottom: none; }
-.step-num { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 500; color: var(--ink); min-width: 24px; line-height: 1.2; }
-.step-content { flex: 1; }
-.step-text { font-size: 13px; line-height: 1.5; color: var(--ink); }
-.step-text strong { font-weight: 600; }
-.step-text .key { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: var(--bg-soft); border: 0.5px solid var(--line); border-radius: 5px; font-size: 11px; font-weight: 500; margin: 0 2px; vertical-align: baseline; }
-.step-icon { display: inline-block; vertical-align: middle; }
-.step-icon svg { width: 14px; height: 14px; vertical-align: middle; }
-
-.install-close-row { margin-top: 16px; }
-.install-close-btn { width: 100%; padding: 14px; background: var(--ink); color: var(--bg); border: none; border-radius: 12px; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
-.install-close-btn:active { opacity: 0.8; }
-
-.install-cta-native { display: none; width: 100%; padding: 14px; background: var(--ink); color: var(--bg); border: none; border-radius: 12px; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; margin-bottom: 12px; }
-.install-cta-native.visible { display: block; }
-.install-cta-native:active { opacity: 0.8; }
+/* Drag states */
+.streams-list{position:relative}
+.drag-placeholder{border:1.5px dashed var(--ink);border-radius:14px;background:var(--bg-soft);margin-bottom:10px;opacity:.6;pointer-events:none}
 </style>
 </head>
 <body>
@@ -286,20 +318,20 @@ body.edit-mode .add-btn { display: block; }
   <div class="loading-text">Chargement des données</div>
 </div>
 
-<div id="app" style="display: none;">
+<div id="app" style="display:none">
   <header class="header">
     <div class="header-row">
       <div class="brand"><em>Strategy</em> Cockpit</div>
       <div class="header-right">
         <div class="update" id="last-update">—</div>
         <button class="gear-btn" id="gear-btn" title="Mode édition">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
       </div>
     </div>
     <div class="subtitle">
       <span>Joel Hazan · Direction de la Stratégie</span>
-      <span style="display: flex; align-items: center; gap: 10px;">
+      <span style="display:flex;align-items:center;gap:10px">
         <span class="edit-indicator"><span class="edit-indicator-dot"></span>Édition</span>
         <span class="live-indicator" id="live-indicator"><span class="live-dot"></span><span id="live-text">Live</span></span>
       </span>
@@ -327,106 +359,15 @@ body.edit-mode .add-btn { display: block; }
   </main>
 
   <div class="footer-note">Synchronisation Firebase en temps réel</div>
-
-  <div class="install-bar" id="install-bar">
-    <button class="install-btn" id="install-btn" onclick="window.openInstallModal()">
-      <span class="install-icon">
-        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect width="512" height="512" rx="112" fill="#1A1A1A"/><text x="256" y="340" font-family="Georgia,serif" font-size="260" font-style="italic" font-weight="400" fill="#FAF8F4" text-anchor="middle" letter-spacing="-8">JH</text></svg>
-      </span>
-      <span class="install-text">
-        <span class="install-title">Installer l'app</span>
-        <span class="install-sub">Sur l'écran d'accueil</span>
-      </span>
+  <div class="install-bar">
+    <button class="install-btn-outer" onclick="window.openInstallModal()">
+      <span class="install-icon-wrap"><svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect width="512" height="512" rx="112" fill="#1A1A1A"/><text x="256" y="340" font-family="Georgia,serif" font-size="260" font-style="italic" font-weight="400" fill="#FAF8F4" text-anchor="middle" letter-spacing="-8">JH</text></svg></span>
+      <span class="install-text"><span class="install-title-text">Installer l'app</span><span class="install-sub-text">Sur l'écran d'accueil</span></span>
     </button>
   </div>
 </div>
 
-<div class="install-modal" id="install-modal" onclick="if(event.target === this) window.closeInstallModal()">
-  <div class="install-sheet">
-    <div class="install-sheet-handle"></div>
-    <div class="install-hero">
-      <div class="install-hero-icon">
-        <svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><rect width="512" height="512" rx="112" fill="#1A1A1A"/><text x="256" y="340" font-family="Georgia,serif" font-size="260" font-style="italic" font-weight="400" fill="#FAF8F4" text-anchor="middle" letter-spacing="-8">JH</text></svg>
-      </div>
-      <div class="install-hero-title"><em>Installer</em> le Cockpit</div>
-      <div class="install-hero-sub">Accédez à votre cockpit comme à une vraie app, depuis votre écran d'accueil.</div>
-    </div>
-
-    <button class="install-cta-native" id="install-native-btn" onclick="window.triggerNativeInstall()">Installer maintenant</button>
-
-    <div class="platform-tabs">
-      <button class="platform-tab" data-platform="ios">iPhone / iPad</button>
-      <button class="platform-tab" data-platform="android">Android</button>
-      <button class="platform-tab" data-platform="desktop">Ordinateur</button>
-    </div>
-
-    <div class="install-steps" id="steps-ios">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-content"><div class="step-text">Ouvrez cette page dans <strong>Safari</strong> (pas Chrome — l'installation ne fonctionne que sur Safari sur iOS).</div></div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-content"><div class="step-text">Touchez le bouton <strong>Partager</strong> <span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></span> en bas de l'écran.</div></div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-content"><div class="step-text">Faites défiler puis touchez <strong>« Sur l'écran d'accueil »</strong>.</div></div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-content"><div class="step-text">Confirmez avec <strong>« Ajouter »</strong>. L'icône <em>JH</em> apparaît sur votre écran d'accueil.</div></div>
-      </div>
-    </div>
-
-    <div class="install-steps" id="steps-android">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-content"><div class="step-text">Ouvrez cette page dans <strong>Chrome</strong> (ou Edge / Samsung Internet).</div></div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-content"><div class="step-text">Touchez le menu <strong>⋮</strong> en haut à droite.</div></div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-content"><div class="step-text">Sélectionnez <strong>« Installer l'application »</strong> ou <strong>« Ajouter à l'écran d'accueil »</strong>.</div></div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-content"><div class="step-text">Confirmez. L'app s'ajoute à votre tiroir d'applications et à votre écran d'accueil.</div></div>
-      </div>
-    </div>
-
-    <div class="install-steps" id="steps-desktop">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-content"><div class="step-text">Ouvrez cette page dans <strong>Chrome</strong>, <strong>Edge</strong> ou <strong>Brave</strong>.</div></div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-content"><div class="step-text">Cherchez l'icône <span class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg></span> d'installation dans la barre d'adresse (à droite de l'URL).</div></div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-content"><div class="step-text">Cliquez dessus, puis <strong>« Installer »</strong>.</div></div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-content"><div class="step-text">L'app s'ouvre dans sa propre fenêtre et apparaît dans votre dock <span class="key">macOS</span> ou menu Démarrer <span class="key">Windows</span>.</div></div>
-      </div>
-      <div class="step">
-        <div class="step-num">5</div>
-        <div class="step-content"><div class="step-text">Sur <strong>Safari (Mac)</strong> : menu <strong>Fichier</strong> → <strong>Ajouter au Dock</strong>.</div></div>
-      </div>
-    </div>
-
-    <div class="install-close-row">
-      <button class="install-close-btn" onclick="window.closeInstallModal()">Fermer</button>
-    </div>
-  </div>
-</div>
-
+<!-- Password modal -->
 <div class="pw-modal" id="pw-modal">
   <div class="pw-box">
     <div class="pw-title">Mode édition</div>
@@ -440,6 +381,7 @@ body.edit-mode .add-btn { display: block; }
   </div>
 </div>
 
+<!-- Edit modal -->
 <div class="modal-backdrop" id="modal-backdrop"></div>
 <div class="modal" id="edit-modal">
   <div class="modal-header">
@@ -448,11 +390,12 @@ body.edit-mode .add-btn { display: block; }
   </div>
   <div class="modal-body" id="modal-body"></div>
   <div class="modal-footer">
-    <button class="btn btn-danger" id="btn-delete" onclick="window.askDelete()">Supprimer</button>
+    <button class="btn btn-danger" onclick="window.askDelete()">Supprimer</button>
     <button class="btn btn-primary" onclick="window.closeModal()">Terminé</button>
   </div>
 </div>
 
+<!-- Confirm modal -->
 <div class="confirm-modal" id="confirm-modal">
   <div class="confirm-box">
     <div class="confirm-title" id="confirm-title">Confirmer ?</div>
@@ -464,11 +407,36 @@ body.edit-mode .add-btn { display: block; }
   </div>
 </div>
 
+<!-- Doc preview modal -->
+<div class="doc-preview-modal" id="doc-preview-modal">
+  <div class="doc-preview-header">
+    <div class="doc-preview-title" id="doc-preview-title">Document</div>
+    <div class="doc-preview-actions">
+      <a id="doc-preview-link" href="#" target="_blank" class="doc-preview-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Ouvrir
+      </a>
+      <button class="doc-preview-btn" onclick="window.closeDocPreview()">×</button>
+    </div>
+  </div>
+  <div id="doc-preview-content" style="flex:1;display:flex;flex-direction:column"></div>
+</div>
+
+<!-- Install modal -->
+<div class="confirm-modal" id="install-modal" style="align-items:flex-end;padding:0">
+  <div class="confirm-box" style="max-width:480px;width:100%;border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));max-height:85vh;overflow-y:auto">
+    <div style="width:36px;height:4px;background:var(--line-strong);border-radius:2px;margin:0 auto 16px"></div>
+    <div class="confirm-title" style="text-align:center;font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:20px">Installer le Cockpit</div>
+    <div class="confirm-msg" style="text-align:center">Sur iPhone : Safari → Partager → « Sur l'écran d'accueil »<br><br>Sur Android/Desktop : Chrome → menu ⋮ → « Installer l'application »</div>
+    <button class="btn btn-primary" style="width:100%" onclick="document.getElementById('install-modal').classList.remove('active')">Compris</button>
+  </div>
+</div>
+
 <div class="toast" id="toast">Enregistré</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-import { getDatabase, ref, onValue, set, remove, push } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+import { getDatabase, ref, onValue, set, remove, push, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBPiGWMuXhDFekXLpbpR3da3go6Y2livms",
@@ -483,392 +451,438 @@ const firebaseConfig = {
 // ⚠️ CHANGEZ CE MOT DE PASSE
 const EDIT_PASSWORD = "kering2026";
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const fbApp = initializeApp(firebaseConfig);
+const db = getDatabase(fbApp);
 
 let DATA = { streams: {}, personal: {}, meetings: {}, committees: {} };
-let currentEdit = null;
+let currentEdit = null; // { type, id, subId? }
 let confirmCallback = null;
 let saveTimeout = null;
 
-// ====== AUTH MODE ÉDITION ======
+// ====== HELPERS ======
+const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const objArr = o => o ? Object.entries(o) : [];
+const objVals = o => o ? Object.values(o) : [];
+function parseDateStr(s) {
+  if (!s) return null;
+  const m = s.match(/(\d{1,2})\/(\d{1,2})/);
+  return m ? new Date(2026, parseInt(m[2])-1, parseInt(m[1])) : null;
+}
+function sortByDate(a, b) {
+  const pa = parseDateStr(a.d), pb = parseDateStr(b.d);
+  if (!pa) return 1; if (!pb) return -1; return pa-pb;
+}
+function showToast(text) {
+  const t = document.getElementById('toast');
+  t.textContent = text; t.classList.add('active');
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('active'), 2000);
+}
+function getItem(type, id) { return DATA[type]?.[id]; }
+
+// ====== AUTH ======
 document.getElementById('gear-btn').addEventListener('click', () => {
   if (document.body.classList.contains('edit-mode')) {
-    document.body.classList.remove('edit-mode');
-    showToast('Mode édition désactivé');
+    document.body.classList.remove('edit-mode'); showToast('Mode édition désactivé');
   } else {
     if (sessionStorage.getItem('cockpit_edit_auth') === EDIT_PASSWORD) {
-      document.body.classList.add('edit-mode');
-      showToast('Mode édition activé');
-    } else {
-      openPwModal();
-    }
+      document.body.classList.add('edit-mode'); showToast('Mode édition activé');
+    } else openPwModal();
   }
 });
-
 function openPwModal() {
   document.getElementById('pw-modal').classList.add('active');
   setTimeout(() => document.getElementById('pw-input').focus(), 100);
 }
-
 window.closePwModal = () => {
   document.getElementById('pw-modal').classList.remove('active');
   document.getElementById('pw-input').value = '';
   document.getElementById('pw-error').textContent = '';
 };
-
 window.submitPw = () => {
-  const val = document.getElementById('pw-input').value;
-  if (val === EDIT_PASSWORD) {
-    sessionStorage.setItem('cockpit_edit_auth', val);
+  const v = document.getElementById('pw-input').value;
+  if (v === EDIT_PASSWORD) {
+    sessionStorage.setItem('cockpit_edit_auth', v);
     document.body.classList.add('edit-mode');
-    window.closePwModal();
-    showToast('Mode édition activé');
+    window.closePwModal(); showToast('Mode édition activé');
   } else {
     document.getElementById('pw-error').textContent = 'Mot de passe incorrect';
     document.getElementById('pw-input').value = '';
   }
 };
+document.getElementById('pw-input').addEventListener('keypress', e => { if (e.key==='Enter') window.submitPw(); });
 
-document.getElementById('pw-input').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') window.submitPw();
-});
-
-// ====== DATA SUBSCRIPTION ======
-const dataRef = ref(db, '/');
-onValue(dataRef, (snapshot) => {
-  const val = snapshot.val();
-  if (!val) {
-    DATA = { streams: {}, personal: {}, meetings: {}, committees: {} };
-  } else {
-    DATA.streams = val.streams || {};
-    DATA.personal = val.personal || {};
-    DATA.meetings = val.meetings || {};
-    DATA.committees = val.committees || {};
-    DATA.lastUpdate = val.lastUpdate || null;
-  }
+// ====== FIREBASE ======
+const rootRef = ref(db, '/');
+onValue(rootRef, snap => {
+  const v = snap.val() || {};
+  DATA.streams = v.streams || {};
+  DATA.personal = v.personal || {};
+  DATA.meetings = v.meetings || {};
+  DATA.committees = v.committees || {};
+  DATA.streamOrder = v.streamOrder || null;
+  DATA.lastUpdate = v.lastUpdate || null;
   document.getElementById('loading').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   setLive(true);
   renderAll();
-}, (error) => {
-  showError("Connexion impossible", "Vérifiez les règles Firebase et la connexion internet.");
-  setLive(false);
-});
-
+  if (currentEdit && document.getElementById('edit-modal').classList.contains('active')) {
+    refreshModal();
+  }
+}, () => setLive(false));
 window.addEventListener('online', () => setLive(true));
 window.addEventListener('offline', () => setLive(false));
-
-function setLive(online) {
+function setLive(on) {
   const ind = document.getElementById('live-indicator');
   const txt = document.getElementById('live-text');
   if (!ind) return;
-  if (online) { ind.classList.remove('offline'); txt.textContent = 'Live'; }
-  else { ind.classList.add('offline'); txt.textContent = 'Offline'; }
+  ind.classList.toggle('offline', !on);
+  txt.textContent = on ? 'Live' : 'Offline';
+}
+async function save(path, val) {
+  try {
+    await set(ref(db, path), val);
+    await set(ref(db, 'lastUpdate'), new Date().toISOString());
+  } catch(e) { showToast('Erreur de sauvegarde'); }
+}
+function dSave(path, val) {
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => save(path, val), 400);
 }
 
-function showError(title, msg) {
-  document.getElementById('loading').innerHTML = `<div class="error-screen"><div class="error-title">${title}</div><div class="error-msg">${msg}</div></div>`;
+// ====== ORDER / DRAG & DROP ======
+function getOrderedStreams() {
+  const entries = Object.entries(DATA.streams);
+  if (DATA.streamOrder && Array.isArray(DATA.streamOrder)) {
+    const ordered = [];
+    DATA.streamOrder.forEach(id => { if (DATA.streams[id]) ordered.push([id, DATA.streams[id]]); });
+    entries.forEach(([id, s]) => { if (!DATA.streamOrder.includes(id)) ordered.push([id, s]); });
+    return ordered;
+  }
+  // Default: sort by status
+  return entries.sort((a, b) => {
+    const o = {red:0, amber:1, green:2};
+    return (o[a[1].status]??3) - (o[b[1].status]??3);
+  });
 }
-
-function showToast(text) {
-  const toast = document.getElementById('toast');
-  toast.textContent = text;
-  toast.classList.add('active');
-  clearTimeout(toast._timeout);
-  toast._timeout = setTimeout(() => toast.classList.remove('active'), 2000);
-}
-
-function escapeHtml(s) { return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-function getItem(type, id) { return DATA[type] ? DATA[type][id] : null; }
-function getSubArray(obj) { return obj ? Object.entries(obj) : []; }
 
 // ====== RENDER ======
-function sortByDate(a, b) {
-  const pa = parseDateString(a.d);
-  const pb = parseDateString(b.d);
-  if (!pa) return 1;
-  if (!pb) return -1;
-  return pa - pb;
-}
-function parseDateString(s) {
-  if (!s) return null;
-  const m = s.match(/(\d{1,2})\/(\d{1,2})/);
-  if (!m) return null;
-  return new Date(2026, parseInt(m[2]) - 1, parseInt(m[1]));
-}
+const pencilSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+const dragSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/></svg>`;
+const docSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`;
 
-const pencilSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+function renderSubstreamBody(sub) {
+  const nextSteps = objVals(sub.nextSteps||{}).filter(Boolean);
+  const meetings = objVals(sub.meetings||{}).sort(sortByDate);
+  const docs = objArr(sub.docs||{});
+  let html = '';
 
-function renderCard(item, id, type) {
-  const nextSteps = getSubArray(item.nextSteps).map(([_, v]) => v);
-  const meetings = getSubArray(item.meetings).map(([_, v]) => v).sort(sortByDate);
-  const hasBody = nextSteps.length > 0 || meetings.length > 0 || item.arbitrage;
-  const next = meetings[0];
-  const cardId = `${type}-${id}`;
-  return `
-    <article class="card" data-card="${cardId}">
-      <button class="edit-pencil" onclick="window.openEdit('${type}', '${id}'); event.stopPropagation();" title="Modifier">${pencilSvg}</button>
-      <header class="card-head" onclick="window.toggleCard('${cardId}')">
-        <span class="dot ${item.status || 'green'}"></span>
-        <span class="card-name">${escapeHtml(item.name || 'Sans nom')}</span>
-        ${item.staffing ? `<span class="staffing">${escapeHtml(item.staffing)}</span>` : ''}
-        ${hasBody ? '<span class="chevron"></span>' : ''}
-      </header>
-      ${next ? `<div class="card-meta">Prochain : <span class="date">${escapeHtml(next.d)}</span> · ${escapeHtml(next.t)}</div>` : (nextSteps.length > 0 ? `<div class="card-meta">${nextSteps.length} next step${nextSteps.length > 1 ? 's' : ''} en cours</div>` : (item.arbitrage ? `<div class="card-meta" style="color: var(--amber); font-weight: 500;">Arbitrage en attente</div>` : ''))}
-      ${hasBody ? `
-        <div class="card-body">
-          <div class="card-body-inner">
-            ${nextSteps.length > 0 ? `<div class="block"><div class="block-label">Next steps</div><ul class="list">${nextSteps.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul></div>` : ''}
-            ${meetings.length > 0 ? `<div class="block"><div class="block-label">Échéances</div><ul class="list dates">${meetings.map(m => `<li><span class="date">${escapeHtml(m.d)}</span><span class="label">${escapeHtml(m.t)}</span></li>`).join('')}</ul></div>` : ''}
-            ${item.arbitrage ? `<div class="block"><div class="block-label">Arbitrage JH</div><div class="arb-inline">${escapeHtml(item.arbitrage)}</div></div>` : ''}
-          </div>
+  // Update
+  html += `<span class="block-label">Update</span>`;
+  if (sub.update) {
+    html += `<div class="update-box">${esc(sub.update)}</div>`;
+  } else {
+    html += `<div class="update-box empty">Aucune mise à jour</div>`;
+  }
+
+  // Next steps
+  if (nextSteps.length > 0) {
+    html += `<span class="block-label">Next steps</span><ul class="ns-list">${nextSteps.map(s=>`<li>${esc(s)}</li>`).join('')}</ul>`;
+  }
+
+  // Échéances
+  if (meetings.length > 0) {
+    html += `<span class="block-label">Échéances</span><ul class="dates-list">${meetings.map(m=>`<li><span class="date">${esc(m.d)}</span><span class="label">${esc(m.t)}</span></li>`).join('')}</ul>`;
+  }
+
+  // Arbitrage
+  if (sub.arbitrage) {
+    html += `<span class="block-label">Arbitrage JH</span><div class="arb-box">${esc(sub.arbitrage)}</div>`;
+  }
+
+  // Docs
+  if (docs.length > 0) {
+    html += `<span class="block-label">Documents</span><div class="docs-list">${docs.map(([did, doc]) => `
+      <div class="doc-item" onclick="window.openDocPreview('${esc(doc.title||'')}','${esc(doc.url||'')}')">
+        <div class="doc-icon">${docSVG}</div>
+        <div class="doc-info">
+          <div class="doc-title">${esc(doc.title||'Document')}</div>
+          <div class="doc-url">${esc(doc.url||'')}</div>
         </div>
-      ` : ''}
-    </article>
-  `;
+        <div class="doc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+    `).join('')}</div>`;
+  }
+
+  return html;
+}
+
+function renderSubstream(streamId, subId, sub) {
+  const nextSteps = objVals(sub.nextSteps||{}).filter(Boolean);
+  const meetings = objVals(sub.meetings||{}).sort(sortByDate);
+  const next = meetings[0];
+  const hasContent = sub.update || nextSteps.length > 0 || meetings.length > 0 || sub.arbitrage || objArr(sub.docs||{}).length > 0;
+  let preview = '';
+  if (sub.update) preview = esc(sub.update.substring(0,60)) + (sub.update.length>60?'…':'');
+  else if (next) preview = `<span style="font-weight:500">${esc(next.d)}</span> · ${esc(next.t)}`;
+  else if (nextSteps.length > 0) preview = `${nextSteps.length} next step${nextSteps.length>1?'s':''}`;
+
+  return `
+    <div class="substream" data-subid="${subId}">
+      <button class="edit-pencil" onclick="window.openEditSubstream('${streamId}','${subId}');event.stopPropagation()">${pencilSVG}</button>
+      <div class="substream-head" onclick="window.toggleSubstream(this)">
+        <span class="dot ${sub.status||'green'}"></span>
+        <span class="substream-name">${esc(sub.name||'Sous-stream')}</span>
+        ${hasContent ? '<span class="substream-chevron"></span>' : ''}
+      </div>
+      ${preview ? `<div class="substream-preview">${preview}</div>` : ''}
+      ${hasContent ? `<div class="substream-body">${renderSubstreamBody(sub)}</div>` : ''}
+    </div>`;
+}
+
+function renderStreamCard(streamId, stream) {
+  const subs = objArr(stream.substreams||{});
+  const hasSubstreams = subs.length > 0;
+  const statusDisplay = stream.status || (hasSubstreams ? computeParentStatus(stream) : 'green');
+
+  return `
+    <div class="stream-container" data-streamid="${streamId}" draggable="false">
+      <button class="edit-pencil" onclick="window.openEditStream('${streamId}');event.stopPropagation()">${pencilSVG}</button>
+      <div class="stream-header" onclick="window.toggleStream('${streamId}')">
+        <span class="drag-handle" title="Réordonner" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()">${dragSVG}</span>
+        <span class="dot ${statusDisplay}"></span>
+        <span class="stream-name">${esc(stream.name||'Stream')}</span>
+        <span class="stream-meta-row">
+          ${stream.staffing ? `<span class="staffing-badge">${esc(stream.staffing)}</span>` : ''}
+          ${hasSubstreams ? `<span class="substream-count">${subs.length} sous-stream${subs.length>1?'s':''}</span>` : ''}
+        </span>
+        ${hasSubstreams ? '<span class="chevron"></span>' : ''}
+      </div>
+      ${hasSubstreams ? `
+        <div class="substreams-wrapper">
+          ${subs.map(([sid,sub]) => renderSubstream(streamId, sid, sub)).join('')}
+          <button class="add-substream-btn" onclick="window.createNewSubstream('${streamId}')">+ Ajouter un sous-stream</button>
+        </div>
+      ` : `
+        <button class="add-substream-btn" onclick="window.createNewSubstream('${streamId}')">+ Ajouter un sous-stream</button>
+      `}
+    </div>`;
+}
+
+function computeParentStatus(stream) {
+  const subs = objVals(stream.substreams||{});
+  if (subs.some(s=>s.status==='red')) return 'red';
+  if (subs.some(s=>s.status==='amber')) return 'amber';
+  return 'green';
+}
+
+function renderPersonalCard(id, item) {
+  const nextSteps = objVals(item.nextSteps||{}).filter(Boolean);
+  const meetings = objVals(item.meetings||{}).sort(sortByDate);
+  const docs = objArr(item.docs||{});
+  const hasBody = item.update || nextSteps.length>0 || meetings.length>0 || item.arbitrage || docs.length>0;
+  const next = meetings[0];
+  return `
+    <div class="stream-container" data-personalid="${id}">
+      <button class="edit-pencil" onclick="window.openEditPersonal('${id}');event.stopPropagation()">${pencilSVG}</button>
+      <div class="stream-header" onclick="window.togglePersonal('${id}')">
+        <span class="dot ${item.status||'green'}"></span>
+        <span class="stream-name">${esc(item.name||'Sujet')}</span>
+        ${hasBody?'<span class="chevron"></span>':''}
+      </div>
+      ${next ? `<div style="padding:0 16px 10px 34px;font-size:12px;color:var(--ink-soft)">Prochain : <span style="font-weight:500;color:var(--ink)">${esc(next.d)}</span> · ${esc(next.t)}</div>` : ''}
+      ${hasBody ? `
+        <div class="substreams-wrapper">
+          <div class="substream" style="border-bottom:none">
+            <div class="substream-body" style="display:block">
+              ${renderSubstreamBody(item)}
+            </div>
+          </div>
+        </div>` : ''}
+    </div>`;
 }
 
 function renderStreamsPanel() {
-  const entries = Object.entries(DATA.streams);
-  const sorted = entries.sort((a, b) => {
-    const order = { red: 0, amber: 1, green: 2 };
-    return (order[a[1].status] ?? 3) - (order[b[1].status] ?? 3);
-  });
+  const ordered = getOrderedStreams();
   document.getElementById('panel-streams').innerHTML = `
-    <div class="section-head"><div class="section-title">Streams actifs</div><div class="section-count">${entries.length} streams · triés par statut</div></div>
-    ${sorted.map(([id, item]) => renderCard(item, id, 'streams')).join('') || '<div class="empty">Aucun stream pour l\'instant.</div>'}
-    <button class="add-btn" onclick="window.createNew('streams')">+ Ajouter un stream</button>
-  `;
+    <div class="section-head"><div class="section-title">Streams actifs</div><div class="section-count">${ordered.length} streams</div></div>
+    <div class="streams-list" id="streams-list">
+      ${ordered.map(([id,s])=>renderStreamCard(id,s)).join('')}
+    </div>
+    <button class="add-btn" onclick="window.createNewStream()">+ Ajouter un stream</button>`;
+  initDragDrop();
 }
 
 function renderPersonalPanel() {
-  const entries = Object.entries(DATA.personal);
+  const entries = objArr(DATA.personal);
   document.getElementById('panel-personal').innerHTML = `
     <div class="section-head"><div class="section-title">Sujets personnels</div><div class="section-count">Presse · Networking · Branding</div></div>
-    ${entries.map(([id, item]) => renderCard(item, id, 'personal')).join('') || '<div class="empty">Aucun sujet pour l\'instant.</div>'}
-    <button class="add-btn" onclick="window.createNew('personal')">+ Ajouter un sujet</button>
-  `;
+    ${entries.map(([id,item])=>renderPersonalCard(id,item)).join('')||'<div class="empty">Aucun sujet.</div>'}
+    <button class="add-btn" onclick="window.createNewPersonal()">+ Ajouter un sujet</button>`;
 }
 
 function renderMeetingsPanel() {
-  const meetingsEntries = Object.entries(DATA.meetings);
-  const committeesEntries = Object.entries(DATA.committees);
-
-  const meetingsHtml = meetingsEntries.map(([id, m]) => {
-    const agenda = getSubArray(m.agenda).map(([_, v]) => v);
-    return `
-      <div class="meeting-card featured">
-        <button class="edit-pencil" onclick="window.openEdit('meetings', '${id}'); event.stopPropagation();" title="Modifier">${pencilSvg}</button>
-        <div class="meeting-head"><div class="meeting-date-badge">${escapeHtml(m.date || '')}</div><div class="meeting-title-text">${escapeHtml(m.title || '')}</div></div>
-        ${agenda.map(a => `
-          <div class="agenda-item ${a.prep ? 'prep' : ''}">
-            <div class="agenda-row">
-              ${a.time ? `<div class="agenda-time">${escapeHtml(a.time)}</div>` : ''}
-              <div class="agenda-body">
-                <div class="agenda-topic">${escapeHtml(a.topic || '')}${a.prep ? '<span class="prep-flag">À préparer</span>' : ''}</div>
-                ${a.owners ? `<div class="agenda-owners">${escapeHtml(a.owners)}</div>` : ''}
-              </div>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    `;
+  const mEntries = objArr(DATA.meetings);
+  const cEntries = objArr(DATA.committees);
+  const meetingsHtml = mEntries.map(([id,m]) => {
+    const agenda = objVals(m.agenda||{});
+    return `<div class="meeting-card">
+      <button class="edit-pencil" onclick="window.openEditMeeting('${id}');event.stopPropagation()">${pencilSVG}</button>
+      <div class="meeting-head"><div class="meeting-date-badge">${esc(m.date||'')}</div><div class="meeting-title-text">${esc(m.title||'')}</div></div>
+      ${agenda.map(a=>`<div class="agenda-item ${a.prep?'prep':''}"><div class="agenda-row">
+        ${a.time?`<div class="agenda-time">${esc(a.time)}</div>`:''}
+        <div class="agenda-body"><div class="agenda-topic">${esc(a.topic||'')}${a.prep?'<span class="prep-flag">À préparer</span>':''}</div>
+        ${a.owners?`<div class="agenda-owners">${esc(a.owners)}</div>`:''}</div>
+      </div></div>`).join('')}
+    </div>`;
   }).join('');
-
-  const committeesHtml = committeesEntries.map(([id, b]) => `
-    <div class="timeline-item">
-      <button class="edit-pencil" onclick="window.openEdit('committees', '${id}'); event.stopPropagation();" title="Modifier">${pencilSvg}</button>
-      <div class="timeline-date-block">${escapeHtml(b.d || '')}</div>
-      <div class="timeline-label">${escapeHtml(b.t || '')}</div>
-    </div>
-  `).join('');
-
+  const committeeHtml = cEntries.map(([id,b])=>`<div class="timeline-item">
+    <button class="edit-pencil" onclick="window.openEditCommittee('${id}');event.stopPropagation()">${pencilSVG}</button>
+    <div class="timeline-date-block">${esc(b.d||'')}</div>
+    <div class="timeline-label">${esc(b.t||'')}</div>
+  </div>`).join('');
   document.getElementById('panel-meetings').innerHTML = `
-    <div class="section-head"><div class="section-title">Group meetings</div><div class="section-count">${meetingsEntries.length} prévus</div></div>
-    ${meetingsHtml || '<div class="empty">Aucun meeting.</div>'}
-    <button class="add-btn" onclick="window.createNew('meetings')">+ Ajouter un meeting</button>
-    <div class="section-head"><div class="section-title">Brand committees</div><div class="section-count">${committeesEntries.length} prévus</div></div>
-    ${committeesHtml || '<div class="empty">Aucun committee.</div>'}
-    <button class="add-btn" onclick="window.createNew('committees')">+ Ajouter un brand committee</button>
-  `;
+    <div class="section-head"><div class="section-title">Group meetings</div><div class="section-count">${mEntries.length} prévus</div></div>
+    ${meetingsHtml||'<div class="empty">Aucun meeting.</div>'}
+    <button class="add-btn" onclick="window.createNewMeeting()">+ Ajouter un meeting</button>
+    <div class="section-head"><div class="section-title">Brand committees</div><div class="section-count">${cEntries.length} prévus</div></div>
+    ${committeeHtml||'<div class="empty">Aucun committee.</div>'}
+    <button class="add-btn" onclick="window.createNewCommittee()">+ Ajouter un brand committee</button>`;
 }
 
 function renderArbitragesPanel() {
-  const all = [
-    ...Object.entries(DATA.streams).filter(([_, s]) => s.arbitrage).map(([id, s]) => ({ id, type: 'streams', ...s, source: 'Stream équipe' })),
-    ...Object.entries(DATA.personal).filter(([_, s]) => s.arbitrage).map(([id, s]) => ({ id, type: 'personal', ...s, source: 'Sujet JH' }))
-  ];
+  const all = [];
+  getOrderedStreams().forEach(([sid, stream]) => {
+    objArr(stream.substreams||{}).forEach(([subid, sub]) => {
+      if (sub.arbitrage) all.push({name:`${stream.name} › ${sub.name}`, arb:sub.arbitrage, type:'substream', streamId:sid, subId:subid});
+    });
+    // backward compat: stream-level arbitrage
+    if (stream.arbitrage) all.push({name:stream.name, arb:stream.arbitrage, type:'streams', id:sid});
+  });
+  objArr(DATA.personal).forEach(([id,s]) => {
+    if (s.arbitrage) all.push({name:s.name, arb:s.arbitrage, type:'personal', id});
+  });
   document.getElementById('badge-arb').textContent = all.length;
-  document.getElementById('panel-arbitrages').innerHTML = all.length === 0 ? '<div class="empty">Aucun arbitrage en attente.</div>' : `
-    <div class="section-head"><div class="section-title">En attente de décision</div><div class="section-count">${all.length} arbitrage${all.length > 1 ? 's' : ''}</div></div>
-    ${all.map(s => `
-      <div class="arb-card">
-        <button class="edit-pencil" onclick="window.openEdit('${s.type}', '${s.id}'); event.stopPropagation();" title="Modifier">${pencilSvg}</button>
-        <div class="arb-stream-name">${escapeHtml(s.name)} · ${s.source}</div>
-        <div class="arb-question">${escapeHtml(s.arbitrage)}</div>
-      </div>
-    `).join('')}
-  `;
+  document.getElementById('panel-arbitrages').innerHTML = all.length===0 ? '<div class="empty">Aucun arbitrage en attente.</div>' : `
+    <div class="section-head"><div class="section-title">En attente de décision</div><div class="section-count">${all.length} arbitrage${all.length>1?'s':''}</div></div>
+    ${all.map(a=>`<div class="arb-card">
+      <button class="edit-pencil" onclick="${a.type==='substream'?`window.openEditSubstream('${a.streamId}','${a.subId}')`:`window.openEdit('${a.type}','${a.id}')`};event.stopPropagation()">${pencilSVG}</button>
+      <div class="arb-stream-name">${esc(a.name)}</div>
+      <div class="arb-question">${esc(a.arb)}</div>
+    </div>`).join('')}`;
 }
 
 function renderStats() {
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  const in7days = new Date(today);
-  in7days.setDate(in7days.getDate() + 7);
-  let deadlineCount = 0;
-  [...Object.values(DATA.streams), ...Object.values(DATA.personal)].forEach(s => {
-    getSubArray(s.meetings).forEach(([_, m]) => {
-      const d = parseDateString(m.d);
-      if (d && d >= today && d <= in7days) deadlineCount++;
-    });
+  const today = new Date(); today.setHours(0,0,0,0);
+  const in7 = new Date(today); in7.setDate(in7.getDate()+7);
+  let dl = 0;
+  const checkMeetings = (meetings) => objVals(meetings||{}).forEach(m => {
+    const d = parseDateStr(m.d);
+    if (d && d>=today && d<=in7) dl++;
   });
-  const arbCount = Object.values(DATA.streams).filter(s => s.arbitrage).length + Object.values(DATA.personal).filter(s => s.arbitrage).length;
+  getOrderedStreams().forEach(([_,s]) => {
+    objVals(s.substreams||{}).forEach(sub => checkMeetings(sub.meetings));
+    checkMeetings(s.meetings);
+  });
+  objVals(DATA.personal).forEach(p => checkMeetings(p.meetings));
+  const arbCount = document.getElementById('badge-arb')?.textContent || 0;
   document.getElementById('stat-streams').textContent = Object.keys(DATA.streams).length;
-  document.getElementById('stat-deadlines').textContent = deadlineCount;
+  document.getElementById('stat-deadlines').textContent = dl;
   document.getElementById('stat-arb').textContent = arbCount;
   if (DATA.lastUpdate) {
     const d = new Date(DATA.lastUpdate);
-    document.getElementById('last-update').textContent = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+    document.getElementById('last-update').textContent = d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
   }
 }
 
 function renderAll() {
+  renderArbitragesPanel(); // sets badge first
   renderStats();
   renderStreamsPanel();
   renderPersonalPanel();
   renderMeetingsPanel();
-  renderArbitragesPanel();
+}
+
+// ====== TOGGLE ======
+window.toggleStream = (id) => {
+  const el = document.querySelector(`[data-streamid="${id}"]`);
+  if (el) el.classList.toggle('open');
+};
+window.toggleSubstream = (headEl) => {
+  const sub = headEl.closest('.substream');
+  if (sub) sub.classList.toggle('open');
+};
+window.togglePersonal = (id) => {
+  const el = document.querySelector(`[data-personalid="${id}"]`);
+  if (el) el.classList.toggle('open');
+};
+
+// ====== DRAG & DROP STREAMS ======
+function initDragDrop() {
+  const list = document.getElementById('streams-list');
+  if (!list) return;
+  let dragEl = null, placeholder = null, startY = 0, startScrollY = 0;
+
+  list.querySelectorAll('.stream-container').forEach(card => {
+    const handle = card.querySelector('.drag-handle');
+    if (!handle) return;
+
+    const startDrag = (clientY) => {
+      if (!document.body.classList.contains('edit-mode')) return;
+      dragEl = card;
+      startY = clientY;
+      startScrollY = window.scrollY;
+      card.classList.add('dragging');
+      card.setAttribute('draggable', 'true');
+      placeholder = document.createElement('div');
+      placeholder.className = 'drag-placeholder';
+      placeholder.style.height = card.offsetHeight + 'px';
+      card.after(placeholder);
+    };
+
+    handle.addEventListener('mousedown', e => { e.preventDefault(); startDrag(e.clientY); });
+    handle.addEventListener('touchstart', e => { startDrag(e.touches[0].clientY); }, {passive:true});
+  });
+
+  const onMove = (clientY) => {
+    if (!dragEl) return;
+    const dy = clientY - startY + (window.scrollY - startScrollY);
+    dragEl.style.transform = `translateY(${dy}px)`;
+    const cards = [...list.querySelectorAll('.stream-container:not(.dragging)')];
+    let insertBefore = null;
+    for (const c of cards) {
+      const r = c.getBoundingClientRect();
+      if (clientY < r.top + r.height/2) { insertBefore = c; break; }
+    }
+    if (insertBefore) list.insertBefore(placeholder, insertBefore);
+    else list.appendChild(placeholder);
+  };
+
+  const endDrag = () => {
+    if (!dragEl) return;
+    dragEl.style.transform = '';
+    dragEl.classList.remove('dragging');
+    dragEl.setAttribute('draggable', 'false');
+    if (placeholder) list.insertBefore(dragEl, placeholder);
+    placeholder?.remove(); placeholder = null;
+    // Save new order
+    const newOrder = [...list.querySelectorAll('.stream-container')].map(c => c.dataset.streamid).filter(Boolean);
+    save('streamOrder', newOrder);
+    dragEl = null;
+  };
+
+  document.addEventListener('mousemove', e => onMove(e.clientY));
+  document.addEventListener('touchmove', e => onMove(e.touches[0].clientY), {passive:true});
+  document.addEventListener('mouseup', endDrag);
+  document.addEventListener('touchend', endDrag);
 }
 
 // ====== EDIT MODAL ======
-window.openEdit = (type, id) => {
-  currentEdit = { type, id };
-  const item = getItem(type, id);
-  if (!item) return;
-  const titleMap = { streams: 'Modifier le stream', personal: 'Modifier le sujet', meetings: 'Modifier le meeting', committees: 'Modifier le committee' };
-  document.getElementById('modal-title').textContent = titleMap[type];
-  refreshModalBody();
+function openModal(title) {
+  document.getElementById('modal-title').textContent = title;
   document.getElementById('modal-backdrop').classList.add('active');
   document.getElementById('edit-modal').classList.add('active');
   document.body.style.overflow = 'hidden';
-};
-
-function refreshModalBody() {
-  if (!currentEdit) return;
-  const item = getItem(currentEdit.type, currentEdit.id);
-  if (!item) return;
-  document.getElementById('modal-body').innerHTML = renderEditForm(currentEdit.type, currentEdit.id, item);
 }
-
-function renderEditForm(type, id, item) {
-  if (type === 'meetings') return renderMeetingForm(id, item);
-  if (type === 'committees') return renderCommitteeForm(id, item);
-  return renderStreamForm(type, id, item);
-}
-
-function renderStreamForm(type, id, item) {
-  const nextSteps = getSubArray(item.nextSteps);
-  const meetings = getSubArray(item.meetings);
-  return `
-    <div class="field">
-      <label class="field-label">Nom</label>
-      <input type="text" value="${escapeHtml(item.name || '')}" oninput="window.saveField('${type}', '${id}', 'name', this.value)" placeholder="Nom du ${type === 'streams' ? 'stream' : 'sujet'}">
-    </div>
-    <div class="field">
-      <label class="field-label">Statut</label>
-      <div class="status-pills">
-        ${['green', 'amber', 'red'].map(s => `
-          <div class="status-pill ${item.status === s ? 'selected' : ''}" onclick="window.saveStatus('${type}', '${id}', '${s}')">
-            <span class="pill-dot ${s}"></span>
-            <span>${s === 'green' ? 'On track' : s === 'amber' ? 'À surveiller' : 'Bloqué'}</span>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-    ${type === 'streams' ? `
-      <div class="field">
-        <label class="field-label">Staffing</label>
-        <input type="text" value="${escapeHtml(item.staffing || '')}" oninput="window.saveField('${type}', '${id}', 'staffing', this.value)" placeholder="Ex: BF / PB">
-      </div>
-    ` : ''}
-    <div class="field">
-      <label class="field-label">Next steps</label>
-      <div class="subitems">
-        ${nextSteps.map(([nsId, ns]) => `
-          <div class="subitem">
-            <input type="text" value="${escapeHtml(ns || '')}" oninput="window.saveSubitem('${type}', '${id}', 'nextSteps', '${nsId}', this.value)" placeholder="Next step">
-            <button class="remove-btn" onclick="window.removeSubitem('${type}', '${id}', 'nextSteps', '${nsId}')">×</button>
-          </div>
-        `).join('')}
-      </div>
-      <button class="add-subitem" onclick="window.addSubitem('${type}', '${id}', 'nextSteps')">+ Ajouter</button>
-    </div>
-    <div class="field">
-      <label class="field-label">Échéances</label>
-      <div class="subitems">
-        ${meetings.map(([mId, m]) => `
-          <div class="subitem">
-            <input class="date-input" type="text" value="${escapeHtml(m.d || '')}" oninput="window.saveMeetingField('${type}', '${id}', '${mId}', 'd', this.value)" placeholder="JJ/MM">
-            <input type="text" value="${escapeHtml(m.t || '')}" oninput="window.saveMeetingField('${type}', '${id}', '${mId}', 't', this.value)" placeholder="Description">
-            <button class="remove-btn" onclick="window.removeSubitem('${type}', '${id}', 'meetings', '${mId}')">×</button>
-          </div>
-        `).join('')}
-      </div>
-      <button class="add-subitem" onclick="window.addMeetingToItem('${type}', '${id}')">+ Ajouter</button>
-    </div>
-    <div class="field">
-      <label class="field-label">Arbitrage JH (laisser vide si aucun)</label>
-      <textarea oninput="window.saveField('${type}', '${id}', 'arbitrage', this.value)" placeholder="Question en attente de décision...">${escapeHtml(item.arbitrage || '')}</textarea>
-    </div>
-  `;
-}
-
-function renderMeetingForm(id, item) {
-  const agenda = getSubArray(item.agenda);
-  return `
-    <div class="field">
-      <label class="field-label">Date</label>
-      <input type="text" value="${escapeHtml(item.date || '')}" oninput="window.saveField('meetings', '${id}', 'date', this.value)" placeholder="26 mai">
-    </div>
-    <div class="field">
-      <label class="field-label">Titre</label>
-      <input type="text" value="${escapeHtml(item.title || '')}" oninput="window.saveField('meetings', '${id}', 'title', this.value)" placeholder="Operations Committee">
-    </div>
-    <div class="field">
-      <label class="field-label">Agenda</label>
-      <div class="subitems">
-        ${agenda.map(([aId, a]) => `
-          <div class="subitem subitem-row-wrap">
-            <input class="time-input" type="text" value="${escapeHtml(a.time || '')}" oninput="window.saveAgenda('${id}', '${aId}', 'time', this.value)" placeholder="13:00–13:45">
-            <input type="text" value="${escapeHtml(a.topic || '')}" oninput="window.saveAgenda('${id}', '${aId}', 'topic', this.value)" placeholder="Sujet">
-            <button class="remove-btn" onclick="window.removeAgenda('${id}', '${aId}')">×</button>
-            <div class="meta-row">
-              <input type="text" value="${escapeHtml(a.owners || '')}" oninput="window.saveAgenda('${id}', '${aId}', 'owners', this.value)" placeholder="Owners">
-              <label class="checkbox-pill"><input type="checkbox" ${a.prep ? 'checked' : ''} onchange="window.saveAgenda('${id}', '${aId}', 'prep', this.checked)">À préparer</label>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-      <button class="add-subitem" onclick="window.addAgendaItem('${id}')">+ Point d'agenda</button>
-    </div>
-  `;
-}
-
-function renderCommitteeForm(id, item) {
-  return `
-    <div class="field">
-      <label class="field-label">Date</label>
-      <input type="text" value="${escapeHtml(item.d || '')}" oninput="window.saveField('committees', '${id}', 'd', this.value)" placeholder="2 juin">
-    </div>
-    <div class="field">
-      <label class="field-label">Titre</label>
-      <input type="text" value="${escapeHtml(item.t || '')}" oninput="window.saveField('committees', '${id}', 't', this.value)" placeholder="Brand Committee SL">
-    </div>
-  `;
-}
-
 window.closeModal = () => {
   document.getElementById('modal-backdrop').classList.remove('active');
   document.getElementById('edit-modal').classList.remove('active');
@@ -877,255 +891,311 @@ window.closeModal = () => {
 };
 document.getElementById('modal-backdrop').addEventListener('click', window.closeModal);
 
-// ====== SAVE OPS ======
-async function saveToDb(path, value) {
-  try {
-    await set(ref(db, path), value);
-    await set(ref(db, 'lastUpdate'), new Date().toISOString());
-  } catch (e) {
-    showToast('Erreur de sauvegarde');
-    console.error(e);
+function refreshModal() {
+  if (!currentEdit) return;
+  const { type, id, subId } = currentEdit;
+  if (type === 'substream') {
+    const item = DATA.streams[id]?.substreams?.[subId];
+    if (item) document.getElementById('modal-body').innerHTML = buildSubstreamForm(id, subId, item);
+  } else if (type === 'stream') {
+    const item = DATA.streams[id];
+    if (item) document.getElementById('modal-body').innerHTML = buildStreamForm(id, item);
+  } else if (type === 'personal') {
+    const item = DATA.personal[id];
+    if (item) document.getElementById('modal-body').innerHTML = buildPersonalForm(id, item);
+  } else if (type === 'meeting') {
+    const item = DATA.meetings[id];
+    if (item) document.getElementById('modal-body').innerHTML = buildMeetingForm(id, item);
+  } else if (type === 'committee') {
+    const item = DATA.committees[id];
+    if (item) document.getElementById('modal-body').innerHTML = buildCommitteeForm(id, item);
   }
 }
 
-function debouncedSave(path, value) {
-  clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(() => saveToDb(path, value), 400);
+// ====== FORMS ======
+function statusPills(type, id, subPath, current) {
+  const path = subPath ? `${type}/${id}/${subPath}/status` : `${type}/${id}/status`;
+  return `<div class="status-pills">${['green','amber','red'].map(s=>`
+    <div class="status-pill ${current===s?'selected':''}" onclick="window.saveToPath('${path}','${s}')">
+      <span class="pill-dot ${s}"></span>
+      <span>${s==='green'?'On track':s==='amber'?'À surveiller':'Bloqué'}</span>
+    </div>`).join('')}</div>`;
 }
 
-window.saveField = (type, id, field, value) => debouncedSave(`${type}/${id}/${field}`, value);
-window.saveSubitem = (type, id, subfield, subId, value) => debouncedSave(`${type}/${id}/${subfield}/${subId}`, value);
-window.saveMeetingField = (type, id, mId, field, value) => debouncedSave(`${type}/${id}/meetings/${mId}/${field}`, value);
-window.saveAgenda = (mId, aId, field, value) => debouncedSave(`meetings/${mId}/agenda/${aId}/${field}`, value);
+function buildStreamForm(id, item) {
+  return `
+    <div class="field"><label class="field-label">Nom du stream</label>
+      <input type="text" value="${esc(item.name||'')}" oninput="window.dSavePath('streams/${id}/name',this.value)" placeholder="Nom"></div>
+    <div class="field"><label class="field-label">Statut global</label>${statusPills('streams',id,'',item.status||'green')}</div>
+    <div class="field"><label class="field-label">Staffing</label>
+      <input type="text" value="${esc(item.staffing||'')}" oninput="window.dSavePath('streams/${id}/staffing',this.value)" placeholder="Ex: BF / PB"></div>`;
+}
 
-window.saveStatus = async (type, id, status) => {
-  await saveToDb(`${type}/${id}/status`, status);
+function buildSubstreamForm(streamId, subId, sub) {
+  const base = `streams/${streamId}/substreams/${subId}`;
+  const nextSteps = objArr(sub.nextSteps||{});
+  const meetings = objArr(sub.meetings||{});
+  const docs = objArr(sub.docs||{});
+  return `
+    <div class="field"><label class="field-label">Nom</label>
+      <input type="text" value="${esc(sub.name||'')}" oninput="window.dSavePath('${base}/name',this.value)" placeholder="Nom du sous-stream"></div>
+    <div class="field"><label class="field-label">Statut</label>${statusPills('streams',streamId,`substreams/${subId}`,sub.status||'green')}</div>
+    <div class="field"><label class="field-label">Update</label>
+      <textarea oninput="window.dSavePath('${base}/update',this.value)" placeholder="Dernière mise à jour…">${esc(sub.update||'')}</textarea></div>
+    <div class="field"><label class="field-label">Next steps</label>
+      <div class="subitems">${nextSteps.map(([nsid,ns])=>`
+        <div class="subitem"><input type="text" value="${esc(ns||'')}" oninput="window.dSavePath('${base}/nextSteps/${nsid}',this.value)" placeholder="Next step">
+        <button class="remove-btn" onclick="window.rmPath('${base}/nextSteps/${nsid}')">×</button></div>`).join('')}</div>
+      <button class="add-subitem" onclick="window.addToPath('${base}/nextSteps','')">+ Ajouter</button></div>
+    <div class="field"><label class="field-label">Échéances</label>
+      <div class="subitems">${meetings.map(([mid,m])=>`
+        <div class="subitem"><input class="date-input" type="text" value="${esc(m.d||'')}" oninput="window.dSavePath('${base}/meetings/${mid}/d',this.value)" placeholder="JJ/MM">
+        <input type="text" value="${esc(m.t||'')}" oninput="window.dSavePath('${base}/meetings/${mid}/t',this.value)" placeholder="Description">
+        <button class="remove-btn" onclick="window.rmPath('${base}/meetings/${mid}')">×</button></div>`).join('')}</div>
+      <button class="add-subitem" onclick="window.addObjToPath('${base}/meetings',{d:'',t:''})">+ Ajouter</button></div>
+    <div class="field"><label class="field-label">Arbitrage JH</label>
+      <textarea oninput="window.dSavePath('${base}/arbitrage',this.value||null)" placeholder="Question en attente…">${esc(sub.arbitrage||'')}</textarea></div>
+    <div class="modal-section-divider">Documents</div>
+    <div class="field">
+      <div id="docs-form-list">${docs.map(([did,doc])=>buildDocRow(base,did,doc)).join('')}</div>
+      <button class="add-subitem" onclick="window.addDocToPath('${base}')">+ Ajouter un lien</button>
+    </div>`;
+}
+
+function buildDocRow(base, did, doc) {
+  return `<div class="doc-form-row" id="doc-row-${did}">
+    <button class="remove-doc-btn" onclick="window.rmPath('${base}/docs/${did}')">×</button>
+    <div class="field"><label class="field-label">Titre</label>
+      <input type="text" value="${esc(doc.title||'')}" oninput="window.dSavePath('${base}/docs/${did}/title',this.value)" placeholder="Ex: Pitch deck HoW"></div>
+    <div class="field"><label class="field-label">Lien SharePoint / URL</label>
+      <input type="text" value="${esc(doc.url||'')}" oninput="window.dSavePath('${base}/docs/${did}/url',this.value)" placeholder="https://…"></div>
+  </div>`;
+}
+
+function buildPersonalForm(id, item) {
+  const base = `personal/${id}`;
+  const nextSteps = objArr(item.nextSteps||{});
+  const meetings = objArr(item.meetings||{});
+  const docs = objArr(item.docs||{});
+  return `
+    <div class="field"><label class="field-label">Nom</label>
+      <input type="text" value="${esc(item.name||'')}" oninput="window.dSavePath('${base}/name',this.value)" placeholder="Nom"></div>
+    <div class="field"><label class="field-label">Statut</label>${statusPills('personal',id,'',item.status||'green')}</div>
+    <div class="field"><label class="field-label">Update</label>
+      <textarea oninput="window.dSavePath('${base}/update',this.value)" placeholder="Dernière mise à jour…">${esc(item.update||'')}</textarea></div>
+    <div class="field"><label class="field-label">Next steps</label>
+      <div class="subitems">${nextSteps.map(([nsid,ns])=>`
+        <div class="subitem"><input type="text" value="${esc(ns||'')}" oninput="window.dSavePath('${base}/nextSteps/${nsid}',this.value)" placeholder="Next step">
+        <button class="remove-btn" onclick="window.rmPath('${base}/nextSteps/${nsid}')">×</button></div>`).join('')}</div>
+      <button class="add-subitem" onclick="window.addToPath('${base}/nextSteps','')">+ Ajouter</button></div>
+    <div class="field"><label class="field-label">Échéances</label>
+      <div class="subitems">${meetings.map(([mid,m])=>`
+        <div class="subitem"><input class="date-input" type="text" value="${esc(m.d||'')}" oninput="window.dSavePath('${base}/meetings/${mid}/d',this.value)" placeholder="JJ/MM">
+        <input type="text" value="${esc(m.t||'')}" oninput="window.dSavePath('${base}/meetings/${mid}/t',this.value)" placeholder="Description">
+        <button class="remove-btn" onclick="window.rmPath('${base}/meetings/${mid}')">×</button></div>`).join('')}</div>
+      <button class="add-subitem" onclick="window.addObjToPath('${base}/meetings',{d:'',t:''})">+ Ajouter</button></div>
+    <div class="field"><label class="field-label">Arbitrage JH</label>
+      <textarea oninput="window.dSavePath('${base}/arbitrage',this.value||null)" placeholder="Question en attente…">${esc(item.arbitrage||'')}</textarea></div>
+    <div class="modal-section-divider">Documents</div>
+    <div class="field">
+      <div id="docs-form-list">${docs.map(([did,doc])=>buildDocRow(base,did,doc)).join('')}</div>
+      <button class="add-subitem" onclick="window.addDocToPath('${base}')">+ Ajouter un lien</button>
+    </div>`;
+}
+
+function buildMeetingForm(id, item) {
+  const agenda = objArr(item.agenda||{});
+  return `
+    <div class="field"><label class="field-label">Date</label>
+      <input type="text" value="${esc(item.date||'')}" oninput="window.dSavePath('meetings/${id}/date',this.value)" placeholder="26 mai"></div>
+    <div class="field"><label class="field-label">Titre</label>
+      <input type="text" value="${esc(item.title||'')}" oninput="window.dSavePath('meetings/${id}/title',this.value)" placeholder="Operations Committee"></div>
+    <div class="field"><label class="field-label">Agenda</label>
+      <div class="subitems">${agenda.map(([aid,a])=>`
+        <div class="subitem subitem-row-wrap">
+          <input type="text" value="${esc(a.time||'')}" oninput="window.dSavePath('meetings/${id}/agenda/${aid}/time',this.value)" placeholder="13:00–14:00" style="flex:0 0 110px">
+          <input type="text" value="${esc(a.topic||'')}" oninput="window.dSavePath('meetings/${id}/agenda/${aid}/topic',this.value)" placeholder="Sujet">
+          <button class="remove-btn" onclick="window.rmPath('meetings/${id}/agenda/${aid}')">×</button>
+          <div class="meta-row">
+            <input type="text" value="${esc(a.owners||'')}" oninput="window.dSavePath('meetings/${id}/agenda/${aid}/owners',this.value)" placeholder="Owners">
+            <label class="checkbox-pill"><input type="checkbox" ${a.prep?'checked':''} onchange="window.dSavePath('meetings/${id}/agenda/${aid}/prep',this.checked)">À préparer</label>
+          </div>
+        </div>`).join('')}</div>
+      <button class="add-subitem" onclick="window.addObjToPath('meetings/${id}/agenda',{time:'',topic:'',owners:'',prep:false})">+ Point d'agenda</button></div>`;
+}
+
+function buildCommitteeForm(id, item) {
+  return `
+    <div class="field"><label class="field-label">Date</label>
+      <input type="text" value="${esc(item.d||'')}" oninput="window.dSavePath('committees/${id}/d',this.value)" placeholder="2 juin"></div>
+    <div class="field"><label class="field-label">Titre</label>
+      <input type="text" value="${esc(item.t||'')}" oninput="window.dSavePath('committees/${id}/t',this.value)" placeholder="Brand Committee SL"></div>`;
+}
+
+// ====== EDIT OPENERS ======
+window.openEditStream = (id) => {
+  currentEdit = {type:'stream', id};
+  openModal('Modifier le stream');
+  document.getElementById('modal-body').innerHTML = buildStreamForm(id, DATA.streams[id]);
+};
+window.openEditSubstream = (streamId, subId) => {
+  currentEdit = {type:'substream', id:streamId, subId};
+  openModal('Modifier le sous-stream');
+  const sub = DATA.streams[streamId]?.substreams?.[subId];
+  document.getElementById('modal-body').innerHTML = buildSubstreamForm(streamId, subId, sub||{});
+};
+window.openEditPersonal = (id) => {
+  currentEdit = {type:'personal', id};
+  openModal('Modifier le sujet');
+  document.getElementById('modal-body').innerHTML = buildPersonalForm(id, DATA.personal[id]||{});
+};
+window.openEditMeeting = (id) => {
+  currentEdit = {type:'meeting', id};
+  openModal('Modifier le meeting');
+  document.getElementById('modal-body').innerHTML = buildMeetingForm(id, DATA.meetings[id]||{});
+};
+window.openEditCommittee = (id) => {
+  currentEdit = {type:'committee', id};
+  openModal('Modifier le committee');
+  document.getElementById('modal-body').innerHTML = buildCommitteeForm(id, DATA.committees[id]||{});
+};
+// legacy for arb panel
+window.openEdit = (type, id) => {
+  if (type==='personal') window.openEditPersonal(id);
+  else if (type==='meetings') window.openEditMeeting(id);
+  else if (type==='committees') window.openEditCommittee(id);
+  else if (type==='streams') window.openEditStream(id);
 };
 
-window.removeSubitem = async (type, id, subfield, subId) => {
-  await remove(ref(db, `${type}/${id}/${subfield}/${subId}`));
+// ====== SAVE HELPERS ======
+window.dSavePath = (path, val) => dSave(path, val);
+window.saveToPath = async (path, val) => { await save(path, val); };
+window.rmPath = async (path) => { await remove(ref(db, path)); };
+window.addToPath = async (path, val) => {
+  const nr = push(ref(db, path));
+  await set(nr, val);
 };
-
-window.addSubitem = async (type, id, subfield) => {
-  const newRef = push(ref(db, `${type}/${id}/${subfield}`));
-  await set(newRef, '');
+window.addObjToPath = async (path, obj) => {
+  const nr = push(ref(db, path));
+  await set(nr, obj);
 };
-
-window.addMeetingToItem = async (type, id) => {
-  const newRef = push(ref(db, `${type}/${id}/meetings`));
-  await set(newRef, { d: '', t: '' });
-};
-
-window.addAgendaItem = async (mId) => {
-  const newRef = push(ref(db, `meetings/${mId}/agenda`));
-  await set(newRef, { time: '', topic: '', owners: '', prep: false });
-};
-
-window.removeAgenda = async (mId, aId) => {
-  await remove(ref(db, `meetings/${mId}/agenda/${aId}`));
+window.addDocToPath = async (base) => {
+  const nr = push(ref(db, `${base}/docs`));
+  await set(nr, {title:'', url:''});
 };
 
 // ====== CREATE ======
-window.createNew = async (type) => {
-  let initial = {};
-  if (type === 'streams') initial = { name: 'Nouveau stream', status: 'green', staffing: '', arbitrage: '' };
-  else if (type === 'personal') initial = { name: 'Nouveau sujet', status: 'green', arbitrage: '' };
-  else if (type === 'meetings') initial = { date: '', title: 'Nouveau meeting' };
-  else if (type === 'committees') initial = { d: '', t: 'Nouveau committee' };
-
-  const newRef = push(ref(db, type));
-  await set(newRef, initial);
-  showToast('Créé');
-  setTimeout(() => window.openEdit(type, newRef.key), 300);
+window.createNewStream = async () => {
+  const nr = push(ref(db, 'streams'));
+  await set(nr, {name:'Nouveau stream', status:'green', staffing:''});
+  showToast('Stream créé');
+  setTimeout(() => window.openEditStream(nr.key), 300);
+};
+window.createNewSubstream = async (streamId) => {
+  if (!document.body.classList.contains('edit-mode')) return;
+  const nr = push(ref(db, `streams/${streamId}/substreams`));
+  await set(nr, {name:'Nouveau sous-stream', status:'green', update:''});
+  showToast('Sous-stream créé');
+  // Open parent then edit substream
+  setTimeout(() => {
+    const el = document.querySelector(`[data-streamid="${streamId}"]`);
+    if (el && !el.classList.contains('open')) el.classList.add('open');
+    window.openEditSubstream(streamId, nr.key);
+  }, 300);
+};
+window.createNewPersonal = async () => {
+  const nr = push(ref(db, 'personal'));
+  await set(nr, {name:'Nouveau sujet', status:'green'});
+  showToast('Sujet créé');
+  setTimeout(() => window.openEditPersonal(nr.key), 300);
+};
+window.createNewMeeting = async () => {
+  const nr = push(ref(db, 'meetings'));
+  await set(nr, {date:'', title:'Nouveau meeting'});
+  showToast('Meeting créé');
+  setTimeout(() => window.openEditMeeting(nr.key), 300);
+};
+window.createNewCommittee = async () => {
+  const nr = push(ref(db, 'committees'));
+  await set(nr, {d:'', t:'Nouveau committee'});
+  showToast('Committee créé');
+  setTimeout(() => window.openEditCommittee(nr.key), 300);
 };
 
-// ====== DELETE WITH CONFIRMATION ======
+// ====== DELETE ======
 window.askDelete = () => {
   if (!currentEdit) return;
-  const item = getItem(currentEdit.type, currentEdit.id);
-  if (!item) return;
-  const name = item.name || item.title || item.t || 'cet élément';
+  const { type, id, subId } = currentEdit;
+  let name = 'cet élément';
+  if (type==='substream') name = DATA.streams[id]?.substreams?.[subId]?.name || name;
+  else if (type==='stream') name = DATA.streams[id]?.name || name;
+  else if (type==='personal') name = DATA.personal[id]?.name || name;
+  else if (type==='meeting') name = DATA.meetings[id]?.title || name;
+  else if (type==='committee') name = DATA.committees[id]?.t || name;
   askConfirm('Supprimer', `Voulez-vous vraiment supprimer « ${name} » ? Cette action est définitive.`, async () => {
-    await remove(ref(db, `${currentEdit.type}/${currentEdit.id}`));
-    window.closeModal();
-    showToast('Supprimé');
+    let path = '';
+    if (type==='substream') path = `streams/${id}/substreams/${subId}`;
+    else if (type==='stream') path = `streams/${id}`;
+    else if (type==='personal') path = `personal/${id}`;
+    else if (type==='meeting') path = `meetings/${id}`;
+    else if (type==='committee') path = `committees/${id}`;
+    await remove(ref(db, path));
+    window.closeModal(); showToast('Supprimé');
   });
 };
-
-function askConfirm(title, msg, callback) {
+function askConfirm(title, msg, cb) {
   document.getElementById('confirm-title').textContent = title;
   document.getElementById('confirm-msg').textContent = msg;
-  confirmCallback = callback;
+  confirmCallback = cb;
   document.getElementById('confirm-modal').classList.add('active');
 }
-
-window.cancelConfirm = () => {
-  document.getElementById('confirm-modal').classList.remove('active');
-  confirmCallback = null;
-};
-
+window.cancelConfirm = () => { document.getElementById('confirm-modal').classList.remove('active'); confirmCallback=null; };
 window.acceptConfirm = async () => {
   if (confirmCallback) await confirmCallback();
-  document.getElementById('confirm-modal').classList.remove('active');
-  confirmCallback = null;
+  document.getElementById('confirm-modal').classList.remove('active'); confirmCallback=null;
 };
 
-window.toggleCard = (id) => {
-  const card = document.querySelector(`[data-card="${id}"]`);
-  if (card) card.classList.toggle('open');
-};
-
-// Refresh modal when DATA updates (so add/remove subitems update the form)
-const originalRenderAll = renderAll;
-function renderAllAndRefreshModal() {
-  originalRenderAll();
-  if (currentEdit && document.getElementById('edit-modal').classList.contains('active')) {
-    // Only re-render modal body if structure changed (subitems count)
-    const item = getItem(currentEdit.type, currentEdit.id);
-    if (!item) {
-      window.closeModal();
-      return;
-    }
-    // Preserve focus
-    const focused = document.activeElement;
-    const focusedSelector = focused && focused.tagName === 'INPUT' || focused.tagName === 'TEXTAREA';
-    if (!focusedSelector) {
-      refreshModalBody();
-    } else {
-      // Check if we need to refresh structure (add/remove)
-      const currentSubitems = document.querySelectorAll('#modal-body .subitem').length;
-      const expectedSubitems = countSubitems(currentEdit.type, currentEdit.id, item);
-      if (currentSubitems !== expectedSubitems) {
-        refreshModalBody();
-      } else {
-        // Update only status pills
-        updateStatusPills(item);
-      }
-    }
-  }
-}
-
-function countSubitems(type, id, item) {
-  if (type === 'meetings') return getSubArray(item.agenda).length;
-  if (type === 'committees') return 0;
-  return getSubArray(item.nextSteps).length + getSubArray(item.meetings).length;
-}
-
-function updateStatusPills(item) {
-  const pills = document.querySelectorAll('#modal-body .status-pill');
-  if (pills.length === 0) return;
-  const statuses = ['green', 'amber', 'red'];
-  pills.forEach((p, i) => {
-    if (statuses[i] === item.status) p.classList.add('selected');
-    else p.classList.remove('selected');
-  });
-}
-
-// Override the onValue callback to use renderAllAndRefreshModal
-onValue(dataRef, (snapshot) => {
-  const val = snapshot.val();
-  if (!val) {
-    DATA = { streams: {}, personal: {}, meetings: {}, committees: {} };
-  } else {
-    DATA.streams = val.streams || {};
-    DATA.personal = val.personal || {};
-    DATA.meetings = val.meetings || {};
-    DATA.committees = val.committees || {};
-    DATA.lastUpdate = val.lastUpdate || null;
-  }
-  renderAllAndRefreshModal();
-});
-
-// Tabs
-document.querySelectorAll('.tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    tab.classList.add('active');
-    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
-});
-
-// ====== INSTALL APP ======
-let deferredInstallPrompt = null;
-
-// Détection plateforme
-function detectPlatform() {
-  const ua = navigator.userAgent.toLowerCase();
-  if (/iphone|ipad|ipod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'ios';
-  if (/android/.test(ua)) return 'android';
-  return 'desktop';
-}
-
-// Masquer le bouton si déjà installé (mode standalone PWA)
-function isStandalone() {
-  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-}
-
-if (isStandalone()) {
-  const bar = document.getElementById('install-bar');
-  if (bar) bar.style.display = 'none';
-}
-
-// Écouter l'événement beforeinstallprompt (Android Chrome, desktop Chrome/Edge)
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredInstallPrompt = e;
-  const nativeBtn = document.getElementById('install-native-btn');
-  if (nativeBtn) nativeBtn.classList.add('visible');
-});
-
-// Détection installation réussie
-window.addEventListener('appinstalled', () => {
-  deferredInstallPrompt = null;
-  const bar = document.getElementById('install-bar');
-  if (bar) bar.style.display = 'none';
-  showToast('App installée');
-  window.closeInstallModal();
-});
-
-window.openInstallModal = () => {
-  const modal = document.getElementById('install-modal');
-  modal.classList.add('active');
+// ====== DOC PREVIEW ======
+window.openDocPreview = (title, url) => {
+  document.getElementById('doc-preview-title').textContent = title;
+  document.getElementById('doc-preview-link').href = url;
+  const content = document.getElementById('doc-preview-content');
+  // Try iframe first, fallback for SharePoint/OneDrive
+  const isSharePoint = url.includes('sharepoint.com') || url.includes('onedrive.live.com') || url.includes('1drv.ms');
+  const embedUrl = isSharePoint ? url.replace(/(:\/\/[^/]+)/, '$1').replace(/\?.*$/, '') + '?web=1&action=embedview' : url;
+  content.innerHTML = `
+    <iframe src="${embedUrl}" class="doc-preview-frame" onload="this.style.display='block'" onerror="window.showDocFallback('${esc(title)}','${esc(url)}')" style="flex:1;border:none"></iframe>
+    <div id="doc-fallback" style="display:none;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px 20px;text-align:center">
+      <div class="doc-preview-fallback-icon">${docSVG.replace('currentColor','var(--blue)')}</div>
+      <div class="doc-preview-fallback-title">${esc(title)}</div>
+      <div class="doc-preview-fallback-msg">Ce document ne peut pas être prévisualisé directement dans l'app. Cliquez pour l'ouvrir dans SharePoint.</div>
+      <a href="${esc(url)}" target="_blank" class="doc-preview-open-btn">Ouvrir le document</a>
+    </div>`;
+  document.getElementById('doc-preview-modal').classList.add('active');
   document.body.style.overflow = 'hidden';
-  // Sélection auto du bon onglet
-  const platform = detectPlatform();
-  setPlatformTab(platform);
 };
-
-window.closeInstallModal = () => {
-  document.getElementById('install-modal').classList.remove('active');
+window.showDocFallback = () => {
+  const fb = document.getElementById('doc-fallback');
+  if (fb) { fb.style.display='flex'; const iframe = document.querySelector('#doc-preview-content iframe'); if(iframe) iframe.style.display='none'; }
+};
+window.closeDocPreview = () => {
+  document.getElementById('doc-preview-modal').classList.remove('active');
   document.body.style.overflow = '';
 };
 
-function setPlatformTab(platform) {
-  document.querySelectorAll('.platform-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.platform === platform);
-  });
-  document.querySelectorAll('.install-steps').forEach(s => {
-    s.classList.toggle('active', s.id === 'steps-' + platform);
-  });
-}
+// ====== INSTALL ======
+window.openInstallModal = () => document.getElementById('install-modal').classList.add('active');
 
-document.querySelectorAll('.platform-tab').forEach(tab => {
-  tab.addEventListener('click', () => setPlatformTab(tab.dataset.platform));
+// ====== TABS ======
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-'+tab.dataset.tab).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
 });
-
-window.triggerNativeInstall = async () => {
-  if (!deferredInstallPrompt) {
-    showToast('Suivez les étapes manuelles ci-dessous');
-    return;
-  }
-  deferredInstallPrompt.prompt();
-  const { outcome } = await deferredInstallPrompt.userChoice;
-  if (outcome === 'accepted') {
-    showToast('Installation en cours...');
-  }
-  deferredInstallPrompt = null;
-  document.getElementById('install-native-btn').classList.remove('visible');
-};
 </script>
-
 </body>
 </html>
