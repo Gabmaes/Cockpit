@@ -14,693 +14,463 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
-  --bg: #FAF8F4;
-  --bg-card: #FFFFFF;
-  --bg-soft: #F2EFE8;
-  --ink: #1A1A1A;
-  --ink-soft: #5C5C5A;
-  --ink-mute: #8E8C86;
-  --line: rgba(26,26,26,0.08);
-  --line-strong: rgba(26,26,26,0.16);
-  --green: #4A7C2A;
-  --green-bg: #E8F0DA;
-  --amber: #B07914;
-  --amber-bg: #FAEFD7;
-  --red: #A02828;
-  --red-bg: #FBE4E2;
-  --accent: #1A1A1A;
+  --bg: #FAF8F4; --bg-card: #FFFFFF; --bg-soft: #F2EFE8;
+  --ink: #1A1A1A; --ink-soft: #5C5C5A; --ink-mute: #8E8C86;
+  --line: rgba(26,26,26,0.08); --line-strong: rgba(26,26,26,0.16);
+  --green: #4A7C2A; --green-bg: #E8F0DA;
+  --amber: #B07914; --amber-bg: #FAEFD7;
+  --red: #A02828; --red-bg: #FBE4E2;
   --shadow: 0 1px 2px rgba(26,26,26,0.04), 0 4px 12px rgba(26,26,26,0.03);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0E0E0C;
-    --bg-card: #1A1A18;
-    --bg-soft: #232320;
-    --ink: #F4F1EA;
-    --ink-soft: #B5B2AA;
-    --ink-mute: #7A7872;
-    --line: rgba(244,241,234,0.10);
-    --line-strong: rgba(244,241,234,0.20);
-    --green: #9BC470;
-    --green-bg: #2A3A1C;
-    --amber: #E0A845;
-    --amber-bg: #3D2E12;
-    --red: #E08585;
-    --red-bg: #3D1F1F;
-    --accent: #F4F1EA;
+    --bg: #0E0E0C; --bg-card: #1A1A18; --bg-soft: #232320;
+    --ink: #F4F1EA; --ink-soft: #B5B2AA; --ink-mute: #7A7872;
+    --line: rgba(244,241,234,0.10); --line-strong: rgba(244,241,234,0.20);
+    --green: #9BC470; --green-bg: #2A3A1C;
+    --amber: #E0A845; --amber-bg: #3D2E12;
+    --red: #E08585; --red-bg: #3D1F1F;
   }
 }
 html, body { background: var(--bg); color: var(--ink); font-family: 'Inter', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
 body { max-width: 480px; margin: 0 auto; min-height: 100vh; padding: env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 80px); }
 
-.header {
-  padding: 20px 20px 16px;
-  border-bottom: 0.5px solid var(--line);
-  background: var(--bg);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  backdrop-filter: saturate(180%) blur(12px);
-  -webkit-backdrop-filter: saturate(180%) blur(12px);
-}
-.header-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; }
+.loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; gap: 16px; }
+.spinner { width: 24px; height: 24px; border: 2px solid var(--line); border-top-color: var(--ink); border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text { font-size: 12px; color: var(--ink-mute); letter-spacing: 0.05em; text-transform: uppercase; }
+
+.live-indicator { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; color: var(--green); letter-spacing: 0.05em; text-transform: uppercase; font-weight: 500; }
+.live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+.live-indicator.offline { color: var(--red); }
+.live-indicator.offline .live-dot { background: var(--red); animation: none; }
+
+.header { padding: 20px 20px 16px; border-bottom: 0.5px solid var(--line); background: var(--bg); position: sticky; top: 0; z-index: 10; backdrop-filter: saturate(180%) blur(12px); -webkit-backdrop-filter: saturate(180%) blur(12px); }
+.header-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 4px; gap: 8px; }
 .brand { font-family: 'Fraunces', serif; font-weight: 400; font-size: 22px; letter-spacing: -0.01em; }
 .brand em { font-style: italic; font-weight: 300; }
+.header-right { display: flex; align-items: center; gap: 10px; }
 .update { font-size: 11px; color: var(--ink-mute); letter-spacing: 0.04em; text-transform: uppercase; }
-.subtitle { font-size: 12px; color: var(--ink-soft); }
+.subtitle { font-size: 12px; color: var(--ink-soft); display: flex; justify-content: space-between; align-items: center; }
 
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); margin: 0; padding: 0; border-top: 0.5px solid var(--line); }
-.stat { background: var(--bg); padding: 14px 16px; text-align: left; }
+.gear-btn { background: transparent; border: 0.5px solid var(--line); border-radius: 8px; width: 28px; height: 28px; cursor: pointer; color: var(--ink-mute); display: flex; align-items: center; justify-content: center; transition: all 0.15s; padding: 0; }
+.gear-btn:hover { color: var(--ink); border-color: var(--ink); background: var(--bg-soft); }
+.gear-btn svg { width: 14px; height: 14px; }
+body.edit-mode .gear-btn { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+body.edit-mode .edit-indicator { display: inline-flex !important; }
+
+.edit-indicator { display: none; align-items: center; gap: 5px; font-size: 10px; color: var(--amber); letter-spacing: 0.05em; text-transform: uppercase; font-weight: 600; }
+.edit-indicator-dot { width: 6px; height: 6px; background: var(--amber); border-radius: 50%; }
+
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border-top: 0.5px solid var(--line); }
+.stat { background: var(--bg); padding: 14px 16px; }
 .stat-num { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 400; line-height: 1; }
 .stat-num.alert { color: var(--red); }
 .stat-num.warn { color: var(--amber); }
-.stat-num.ok { color: var(--green); }
 .stat-label { font-size: 10px; color: var(--ink-mute); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 4px; }
 
-nav.tabs {
-  display: flex;
-  gap: 0;
-  padding: 0;
-  background: var(--bg);
-  border-bottom: 0.5px solid var(--line);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
+nav.tabs { display: flex; background: var(--bg); border-bottom: 0.5px solid var(--line); overflow-x: auto; scrollbar-width: none; }
 nav.tabs::-webkit-scrollbar { display: none; }
-.tab {
-  flex: 1;
-  min-width: max-content;
-  background: transparent;
-  border: none;
-  padding: 14px 16px;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--ink-mute);
-  cursor: pointer;
-  position: relative;
-  white-space: nowrap;
-  transition: color 0.2s;
-}
+.tab { flex: 1; min-width: max-content; background: transparent; border: none; padding: 14px 16px; font-family: inherit; font-size: 13px; font-weight: 500; color: var(--ink-mute); cursor: pointer; position: relative; white-space: nowrap; transition: color 0.2s; }
 .tab.active { color: var(--ink); }
-.tab.active::after {
-  content: '';
-  position: absolute;
-  bottom: -0.5px;
-  left: 16px;
-  right: 16px;
-  height: 2px;
-  background: var(--ink);
-}
-.tab .badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  font-size: 10px;
-  font-weight: 600;
-  background: var(--red-bg);
-  color: var(--red);
-  border-radius: 9px;
-  margin-left: 4px;
-}
+.tab.active::after { content: ''; position: absolute; bottom: -0.5px; left: 16px; right: 16px; height: 2px; background: var(--ink); }
+.tab .badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; font-size: 10px; font-weight: 600; background: var(--red-bg); color: var(--red); border-radius: 9px; margin-left: 4px; }
 
 .content { padding: 16px 20px; }
 .panel { display: none; }
 .panel.active { display: block; animation: fadeIn 0.25s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-.section-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin: 24px 0 10px;
-}
+.section-head { display: flex; align-items: baseline; justify-content: space-between; margin: 24px 0 10px; }
 .section-head:first-child { margin-top: 4px; }
 .section-title { font-family: 'Fraunces', serif; font-size: 14px; font-weight: 500; letter-spacing: 0.02em; text-transform: uppercase; }
 .section-count { font-size: 11px; color: var(--ink-mute); font-variant-numeric: tabular-nums; }
 
-.card {
-  background: var(--bg-card);
-  border: 0.5px solid var(--line);
-  border-radius: 14px;
-  margin-bottom: 8px;
-  overflow: hidden;
-  transition: border-color 0.2s;
-  box-shadow: var(--shadow);
-}
-.card:active { border-color: var(--line-strong); }
+.card { background: var(--bg-card); border: 0.5px solid var(--line); border-radius: 14px; margin-bottom: 8px; overflow: hidden; transition: border-color 0.2s; box-shadow: var(--shadow); position: relative; }
 .card.open { border-color: var(--line-strong); }
-.card-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 16px;
-  cursor: pointer;
-  user-select: none;
-}
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
+.card-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; cursor: pointer; user-select: none; }
+body.edit-mode .card-head { padding-right: 50px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .dot.green { background: var(--green); box-shadow: 0 0 0 3px var(--green-bg); }
 .dot.amber { background: var(--amber); box-shadow: 0 0 0 3px var(--amber-bg); }
 .dot.red { background: var(--red); box-shadow: 0 0 0 3px var(--red-bg); }
-.card-name {
-  flex: 1;
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-}
-.staffing {
-  font-size: 10px;
-  color: var(--ink-soft);
-  background: var(--bg-soft);
-  padding: 3px 7px;
-  border-radius: 6px;
-  letter-spacing: 0.03em;
-  font-weight: 500;
-}
-.chevron {
-  width: 10px;
-  height: 10px;
-  border-right: 1.5px solid var(--ink-mute);
-  border-bottom: 1.5px solid var(--ink-mute);
-  transform: rotate(45deg);
-  margin-left: 2px;
-  margin-bottom: 4px;
-  transition: transform 0.25s ease;
-}
+.card-name { flex: 1; font-size: 15px; font-weight: 500; letter-spacing: -0.01em; }
+.staffing { font-size: 10px; color: var(--ink-soft); background: var(--bg-soft); padding: 3px 7px; border-radius: 6px; letter-spacing: 0.03em; font-weight: 500; }
+.chevron { width: 10px; height: 10px; border-right: 1.5px solid var(--ink-mute); border-bottom: 1.5px solid var(--ink-mute); transform: rotate(45deg); margin-left: 2px; margin-bottom: 4px; transition: transform 0.25s ease; }
 .card.open .chevron { transform: rotate(-135deg); margin-bottom: -4px; }
+.card-meta { padding: 0 16px 12px 34px; font-size: 12px; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; }
+.card-meta .date { color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; }
 
-.card-meta {
-  padding: 0 16px 12px 34px;
-  font-size: 12px;
-  color: var(--ink-soft);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.card-meta .date {
-  color: var(--ink);
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-}
-
-.card-body {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-}
+.card-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
 .card.open .card-body { max-height: 800px; }
-.card-body-inner {
-  padding: 0 16px 16px 34px;
-  border-top: 0.5px solid var(--line);
-  margin-top: 0;
-  padding-top: 14px;
-}
+.card-body-inner { padding: 14px 16px 16px 34px; border-top: 0.5px solid var(--line); }
 .block { margin-bottom: 14px; }
 .block:last-child { margin-bottom: 0; }
-.block-label {
-  font-size: 10px;
-  color: var(--ink-mute);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin-bottom: 6px;
-  font-weight: 600;
-}
+.block-label { font-size: 10px; color: var(--ink-mute); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; font-weight: 600; }
 .list { list-style: none; }
-.list li {
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--ink);
-  padding: 4px 0 4px 14px;
-  position: relative;
-}
-.list li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 12px;
-  width: 5px;
-  height: 1px;
-  background: var(--ink-mute);
-}
-.list.dates li { padding-left: 0; }
+.list li { font-size: 13px; line-height: 1.55; color: var(--ink); padding: 4px 0 4px 14px; position: relative; }
+.list li::before { content: ''; position: absolute; left: 0; top: 12px; width: 5px; height: 1px; background: var(--ink-mute); }
+.list.dates li { padding: 4px 0; display: flex; gap: 10px; }
 .list.dates li::before { display: none; }
-.list.dates li {
-  display: flex;
-  gap: 10px;
-  padding: 4px 0;
-}
-.list.dates .date {
-  font-weight: 500;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-  min-width: 60px;
-  font-size: 12px;
-}
+.list.dates .date { font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; min-width: 60px; font-size: 12px; }
 .list.dates .label { font-size: 13px; color: var(--ink-soft); flex: 1; }
+.arb-inline { background: var(--amber-bg); border-radius: 8px; padding: 8px 10px; font-size: 12px; color: var(--amber); line-height: 1.45; font-weight: 500; }
 
-.arb-inline {
-  background: var(--amber-bg);
-  border-radius: 8px;
-  padding: 8px 10px;
-  font-size: 12px;
-  color: var(--amber);
-  line-height: 1.45;
-  font-weight: 500;
-}
-
-/* Meetings */
-.meeting-card {
-  background: var(--bg-card);
-  border: 0.5px solid var(--line);
-  border-radius: 14px;
-  padding: 16px;
-  margin-bottom: 12px;
-  box-shadow: var(--shadow);
-}
+.meeting-card { background: var(--bg-card); border: 0.5px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow); position: relative; }
 .meeting-card.featured { border-color: var(--ink); }
-.meeting-head {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  margin-bottom: 12px;
-  padding-bottom: 10px;
-  border-bottom: 0.5px solid var(--line);
-}
-.meeting-date-badge {
-  font-family: 'Fraunces', serif;
-  font-size: 20px;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  line-height: 1;
-}
-.meeting-title-text {
-  font-size: 13px;
-  color: var(--ink-soft);
-  flex: 1;
-}
-.agenda-item {
-  padding: 10px 0;
-  border-bottom: 0.5px solid var(--line);
-}
+.meeting-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 0.5px solid var(--line); }
+.meeting-date-badge { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 500; letter-spacing: -0.01em; line-height: 1; }
+.meeting-title-text { font-size: 13px; color: var(--ink-soft); flex: 1; }
+.agenda-item { padding: 10px 0; border-bottom: 0.5px solid var(--line); }
 .agenda-item:last-child { border-bottom: none; padding-bottom: 0; }
 .agenda-item:first-child { padding-top: 0; }
 .agenda-row { display: flex; align-items: flex-start; gap: 10px; }
-.agenda-time {
-  font-size: 11px;
-  color: var(--ink-mute);
-  font-variant-numeric: tabular-nums;
-  min-width: 60px;
-  padding-top: 1px;
-  letter-spacing: 0.02em;
-}
+.agenda-time { font-size: 11px; color: var(--ink-mute); font-variant-numeric: tabular-nums; min-width: 60px; padding-top: 1px; letter-spacing: 0.02em; }
 .agenda-body { flex: 1; }
-.agenda-topic {
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.4;
-  color: var(--ink);
-}
-.agenda-owners {
-  font-size: 11px;
-  color: var(--ink-mute);
-  margin-top: 3px;
-  line-height: 1.35;
-}
-.prep-flag {
-  display: inline-block;
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  background: var(--amber-bg);
-  color: var(--amber);
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-left: 6px;
-  vertical-align: middle;
-}
-.agenda-item.prep .agenda-topic::before {
-  content: '';
-  display: inline-block;
-  width: 3px;
-  height: 3px;
-  background: var(--amber);
-  border-radius: 50%;
-  margin-right: 6px;
-  vertical-align: middle;
-  margin-bottom: 2px;
-}
+.agenda-topic { font-size: 13px; font-weight: 500; line-height: 1.4; color: var(--ink); }
+.agenda-owners { font-size: 11px; color: var(--ink-mute); margin-top: 3px; line-height: 1.35; }
+.prep-flag { display: inline-block; font-size: 9.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; background: var(--amber-bg); color: var(--amber); padding: 2px 6px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
+.agenda-item.prep .agenda-topic::before { content: ''; display: inline-block; width: 3px; height: 3px; background: var(--amber); border-radius: 50%; margin-right: 6px; vertical-align: middle; margin-bottom: 2px; }
 
-.timeline-item {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  background: var(--bg-card);
-  border: 0.5px solid var(--line);
-  border-radius: 12px;
-  margin-bottom: 6px;
-}
-.timeline-date-block {
-  font-family: 'Fraunces', serif;
-  font-size: 18px;
-  font-weight: 500;
-  color: var(--ink);
-  min-width: 56px;
-  letter-spacing: -0.01em;
-}
+.timeline-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--bg-card); border: 0.5px solid var(--line); border-radius: 12px; margin-bottom: 6px; position: relative; }
+.timeline-date-block { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 500; color: var(--ink); min-width: 56px; letter-spacing: -0.01em; }
 .timeline-label { font-size: 13px; color: var(--ink-soft); flex: 1; line-height: 1.3; }
 
-/* Arbitrages panel */
-.arb-card {
-  background: var(--bg-card);
-  border: 0.5px solid var(--line);
-  border-left: 3px solid var(--amber);
-  border-radius: 10px;
-  padding: 12px 14px;
-  margin-bottom: 8px;
-}
-.arb-stream-name {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-mute);
-  margin-bottom: 4px;
-}
-.arb-question {
-  font-size: 14px;
-  color: var(--ink);
-  line-height: 1.45;
-  font-weight: 500;
-}
+.arb-card { background: var(--bg-card); border: 0.5px solid var(--line); border-left: 3px solid var(--amber); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; position: relative; }
+body.edit-mode .arb-card { padding-right: 50px; }
+.arb-stream-name { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: 4px; }
+.arb-question { font-size: 14px; color: var(--ink); line-height: 1.45; font-weight: 500; }
 
-.empty {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--ink-mute);
-  font-size: 13px;
-}
-.footer-note {
-  text-align: center;
-  font-size: 10px;
-  color: var(--ink-mute);
-  padding: 24px 20px 8px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
+.edit-pencil { display: none; position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 8px; background: var(--bg-card); border: 0.5px solid var(--line-strong); color: var(--ink); cursor: pointer; align-items: center; justify-content: center; z-index: 5; box-shadow: var(--shadow); padding: 0; }
+body.edit-mode .edit-pencil { display: flex; }
+.edit-pencil:hover { background: var(--ink); color: var(--bg); }
+.edit-pencil:active { transform: scale(0.95); }
+.edit-pencil svg { width: 14px; height: 14px; }
+
+.add-btn { display: none; width: 100%; padding: 14px; border: 1.5px dashed var(--line-strong); background: transparent; color: var(--ink-soft); border-radius: 12px; font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; margin-top: 8px; transition: all 0.15s; }
+body.edit-mode .add-btn { display: block; }
+.add-btn:hover { color: var(--ink); border-color: var(--ink); background: var(--bg-soft); }
+
+.empty { text-align: center; padding: 40px 20px; color: var(--ink-mute); font-size: 13px; }
+.error-screen { padding: 40px 20px; text-align: center; }
+.error-title { font-family: 'Fraunces', serif; font-size: 20px; margin-bottom: 8px; }
+.error-msg { font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
+.footer-note { text-align: center; font-size: 10px; color: var(--ink-mute); padding: 24px 20px 8px; letter-spacing: 0.05em; text-transform: uppercase; }
+
+/* MODALES */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.modal-backdrop.active { opacity: 1; pointer-events: auto; }
+.modal { position: fixed; inset: 0; background: var(--bg); z-index: 101; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; }
+.modal.active { transform: translateY(0); }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 0.5px solid var(--line); padding-top: calc(16px + env(safe-area-inset-top)); }
+.modal-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 500; letter-spacing: -0.01em; }
+.modal-close { background: transparent; border: none; color: var(--ink); font-size: 28px; line-height: 1; cursor: pointer; padding: 4px 8px; font-weight: 300; }
+.modal-body { flex: 1; overflow-y: auto; padding: 20px; -webkit-overflow-scrolling: touch; }
+.modal-footer { border-top: 0.5px solid var(--line); padding: 14px 20px; padding-bottom: calc(14px + env(safe-area-inset-bottom)); display: flex; gap: 10px; background: var(--bg); }
+
+.field { margin-bottom: 18px; }
+.field-label { font-size: 11px; color: var(--ink-mute); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 8px; display: block; }
+.field input[type="text"], .field textarea, .field select { width: 100%; padding: 12px 14px; border: 0.5px solid var(--line-strong); border-radius: 10px; background: var(--bg-card); font-family: inherit; font-size: 15px; color: var(--ink); -webkit-appearance: none; }
+.field input:focus, .field textarea:focus, .field select:focus { outline: none; border-color: var(--ink); }
+.field textarea { min-height: 80px; resize: vertical; font-family: inherit; line-height: 1.5; }
+
+.status-pills { display: flex; gap: 6px; }
+.status-pill { flex: 1; padding: 12px 8px; border: 0.5px solid var(--line-strong); border-radius: 10px; background: var(--bg-card); cursor: pointer; text-align: center; font-size: 12px; font-weight: 500; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: all 0.15s; }
+.status-pill.selected { border-color: var(--ink); background: var(--bg-soft); }
+.status-pill .pill-dot { width: 10px; height: 10px; border-radius: 50%; }
+.status-pill .pill-dot.green { background: var(--green); }
+.status-pill .pill-dot.amber { background: var(--amber); }
+.status-pill .pill-dot.red { background: var(--red); }
+
+.subitems { margin-top: 4px; }
+.subitem { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+.subitem input { flex: 1; padding: 10px 12px; border: 0.5px solid var(--line-strong); border-radius: 8px; background: var(--bg-card); font-family: inherit; font-size: 14px; color: var(--ink); -webkit-appearance: none; min-width: 0; }
+.subitem input.date-input { flex: 0 0 80px; }
+.subitem input.time-input { flex: 0 0 110px; }
+.subitem .remove-btn { background: transparent; border: 0.5px solid var(--line-strong); border-radius: 8px; width: 34px; height: 34px; cursor: pointer; color: var(--ink-mute); font-size: 18px; flex-shrink: 0; line-height: 1; }
+.subitem .remove-btn:hover { color: var(--red); border-color: var(--red); }
+.subitem-row-wrap { flex-wrap: wrap; }
+.subitem-row-wrap .meta-row { flex-basis: 100%; display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+.checkbox-pill { display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; background: var(--bg-soft); border-radius: 6px; font-size: 12px; color: var(--ink-soft); cursor: pointer; white-space: nowrap; }
+.checkbox-pill input { margin: 0; }
+
+.add-subitem { background: transparent; color: var(--ink-soft); border: 1px dashed var(--line-strong); padding: 10px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 12px; width: 100%; margin-top: 4px; }
+.add-subitem:hover { color: var(--ink); border-color: var(--ink); }
+
+.btn { padding: 12px 18px; border-radius: 10px; font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; }
+.btn-primary { background: var(--ink); color: var(--bg); flex: 1; }
+.btn-primary:active { opacity: 0.7; }
+.btn-secondary { background: var(--bg-card); color: var(--ink); border: 0.5px solid var(--line-strong); }
+.btn-danger { background: transparent; color: var(--red); border: 0.5px solid var(--red); }
+.btn-danger:hover { background: var(--red); color: var(--bg); }
+
+.confirm-modal { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.confirm-modal.active { display: flex; }
+.confirm-box { background: var(--bg-card); border-radius: 16px; padding: 24px; max-width: 320px; width: 100%; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+.confirm-title { font-family: 'Fraunces', serif; font-size: 18px; margin-bottom: 8px; font-weight: 500; }
+.confirm-msg { font-size: 13px; color: var(--ink-soft); line-height: 1.5; margin-bottom: 20px; }
+.confirm-actions { display: flex; gap: 8px; }
+.confirm-actions .btn { flex: 1; padding: 10px 14px; }
+
+.pw-modal { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.pw-modal.active { display: flex; }
+.pw-box { background: var(--bg-card); border-radius: 16px; padding: 24px; max-width: 320px; width: 100%; }
+.pw-title { font-family: 'Fraunces', serif; font-size: 18px; margin-bottom: 6px; font-weight: 500; }
+.pw-msg { font-size: 12px; color: var(--ink-soft); margin-bottom: 16px; line-height: 1.5; }
+.pw-input { width: 100%; padding: 12px 14px; border: 0.5px solid var(--line-strong); border-radius: 10px; background: var(--bg); font-family: inherit; font-size: 15px; color: var(--ink); margin-bottom: 8px; -webkit-appearance: none; }
+.pw-input:focus { outline: none; border-color: var(--ink); }
+.pw-error { color: var(--red); font-size: 12px; min-height: 16px; margin-bottom: 8px; }
+
+.toast { position: fixed; bottom: calc(20px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%) translateY(100px); background: var(--ink); color: var(--bg); padding: 12px 20px; border-radius: 24px; font-size: 13px; font-weight: 500; z-index: 300; transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+.toast.active { transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
 
-<header class="header">
-  <div class="header-row">
-    <div class="brand"><em>Strategy</em> Cockpit</div>
-    <div class="update">11 mai 2026</div>
-  </div>
-  <div class="subtitle">Joel Hazan · Direction de la Stratégie</div>
-</header>
+<div id="loading" class="loading-screen">
+  <div class="spinner"></div>
+  <div class="loading-text">Chargement des données</div>
+</div>
 
-<div class="stats">
-  <div class="stat">
-    <div class="stat-num" id="stat-streams">—</div>
-    <div class="stat-label">Streams</div>
+<div id="app" style="display: none;">
+  <header class="header">
+    <div class="header-row">
+      <div class="brand"><em>Strategy</em> Cockpit</div>
+      <div class="header-right">
+        <div class="update" id="last-update">—</div>
+        <button class="gear-btn" id="gear-btn" title="Mode édition">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+      </div>
+    </div>
+    <div class="subtitle">
+      <span>Joel Hazan · Direction de la Stratégie</span>
+      <span style="display: flex; align-items: center; gap: 10px;">
+        <span class="edit-indicator"><span class="edit-indicator-dot"></span>Édition</span>
+        <span class="live-indicator" id="live-indicator"><span class="live-dot"></span><span id="live-text">Live</span></span>
+      </span>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num" id="stat-streams">—</div><div class="stat-label">Streams</div></div>
+    <div class="stat"><div class="stat-num warn" id="stat-deadlines">—</div><div class="stat-label">Échéances 7j</div></div>
+    <div class="stat"><div class="stat-num alert" id="stat-arb">—</div><div class="stat-label">Arbitrages</div></div>
   </div>
-  <div class="stat">
-    <div class="stat-num warn" id="stat-deadlines">—</div>
-    <div class="stat-label">Échéances 7j</div>
-  </div>
-  <div class="stat">
-    <div class="stat-num alert" id="stat-arb">—</div>
-    <div class="stat-label">Arbitrages</div>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="streams">Streams équipe</button>
+    <button class="tab" data-tab="personal">Sujets JH</button>
+    <button class="tab" data-tab="meetings">Group meetings</button>
+    <button class="tab" data-tab="arbitrages">Arbitrages <span class="badge" id="badge-arb">0</span></button>
+  </nav>
+
+  <main class="content">
+    <div class="panel active" id="panel-streams"></div>
+    <div class="panel" id="panel-personal"></div>
+    <div class="panel" id="panel-meetings"></div>
+    <div class="panel" id="panel-arbitrages"></div>
+  </main>
+
+  <div class="footer-note">Synchronisation Firebase en temps réel</div>
+</div>
+
+<div class="pw-modal" id="pw-modal">
+  <div class="pw-box">
+    <div class="pw-title">Mode édition</div>
+    <div class="pw-msg">Saisissez le mot de passe pour activer l'édition.</div>
+    <input id="pw-input" class="pw-input" type="password" placeholder="Mot de passe" autocomplete="current-password">
+    <div id="pw-error" class="pw-error"></div>
+    <div class="confirm-actions">
+      <button class="btn btn-secondary" onclick="window.closePwModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="window.submitPw()">Valider</button>
+    </div>
   </div>
 </div>
 
-<nav class="tabs">
-  <button class="tab active" data-tab="streams">Streams équipe</button>
-  <button class="tab" data-tab="personal">Sujets JH</button>
-  <button class="tab" data-tab="meetings">Group meetings</button>
-  <button class="tab" data-tab="arbitrages">Arbitrages <span class="badge" id="badge-arb">0</span></button>
-</nav>
+<div class="modal-backdrop" id="modal-backdrop"></div>
+<div class="modal" id="edit-modal">
+  <div class="modal-header">
+    <div class="modal-title" id="modal-title">Édition</div>
+    <button class="modal-close" onclick="window.closeModal()">×</button>
+  </div>
+  <div class="modal-body" id="modal-body"></div>
+  <div class="modal-footer">
+    <button class="btn btn-danger" id="btn-delete" onclick="window.askDelete()">Supprimer</button>
+    <button class="btn btn-primary" onclick="window.closeModal()">Terminé</button>
+  </div>
+</div>
 
-<main class="content">
-  <div class="panel active" id="panel-streams"></div>
-  <div class="panel" id="panel-personal"></div>
-  <div class="panel" id="panel-meetings"></div>
-  <div class="panel" id="panel-arbitrages"></div>
-</main>
+<div class="confirm-modal" id="confirm-modal">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirm-title">Confirmer ?</div>
+    <div class="confirm-msg" id="confirm-msg">Êtes-vous sûr ?</div>
+    <div class="confirm-actions">
+      <button class="btn btn-secondary" onclick="window.cancelConfirm()">Annuler</button>
+      <button class="btn btn-danger" onclick="window.acceptConfirm()">Confirmer</button>
+    </div>
+  </div>
+</div>
 
-<div class="footer-note">Mise à jour hebdomadaire · Source : Weekly Check-in</div>
+<div class="toast" id="toast">Enregistré</div>
 
-<script>
-// =====================================================
-// DONNÉES — Modifier UNIQUEMENT cette section chaque semaine
-// Statuts possibles : 'green', 'amber', 'red'
-// =====================================================
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getDatabase, ref, onValue, set, remove, push } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
 
-const STREAMS = [
-  { name: 'Chine', staffing: 'BF / PB', status: 'amber',
-    nextSteps: ['Monter 2 meetings onboarding (11/05 – 25/05)'],
-    meetings: [
-      { d: '12/05', t: 'Weekly China interne' },
-      { d: '26/05', t: 'Operations Committee' },
-      { d: 'Sem. 25/05', t: 'Onboarding équipes locales' }
-    ],
-    arbitrage: null },
+const firebaseConfig = {
+  apiKey: "AIzaSyBPiGWMuXhDFekXLpbpR3da3go6Y2livms",
+  authDomain: "cockpit-83f61.firebaseapp.com",
+  databaseURL: "https://cockpit-83f61-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "cockpit-83f61",
+  storageBucket: "cockpit-83f61.firebasestorage.app",
+  messagingSenderId: "534977062087",
+  appId: "1:534977062087:web:f834e834d3a760aa530ae2"
+};
 
-  { name: 'FT Summit', staffing: '?', status: 'red',
-    nextSteps: [],
-    meetings: [{ d: '17-19/05', t: 'FT Summit' }],
-    arbitrage: 'Présence confirmée ? Speaker ?' },
+// ⚠️ CHANGEZ CE MOT DE PASSE
+const EDIT_PASSWORD = "kering2026";
 
-  { name: 'HoW', staffing: 'BF / GM', status: 'green',
-    nextSteps: [
-      'Attente réponse fonds (Korelya / Felix / Style)',
-      'Préparer un pitch deck de HoW',
-      'Outil brand desirability IA',
-      'WC × BAL collab (cf. FC1 meeting)'
-    ],
-    meetings: [
-      { d: '12/05', t: 'Weekly interne HoW' },
-      { d: '13/05', t: 'Weekly Segalen' }
-    ],
-    arbitrage: 'Contrat Merger Market : 18 k€ (3 ans) ou 22 k€ (1 an) ?' },
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-  { name: 'Performance Steering', staffing: '?', status: 'amber',
-    nextSteps: ['Prochains brand committees : envoyer agenda préparé par BCG aux marques'],
-    meetings: [
-      { d: '12/05', t: 'Evolution of Performance Steering at Group Level' },
-      { d: '26/05', t: 'Operations Committee – Pre-read' },
-      { d: '27/05', t: 'Bi-Weekly LDM – présenter l\'évolution' }
-    ],
-    arbitrage: null },
+let DATA = { streams: {}, personal: {}, meetings: {}, committees: {} };
+let currentEdit = null;
+let confirmCallback = null;
+let saveTimeout = null;
 
-  { name: 'K Leadership Training', staffing: 'Team', status: 'amber',
-    nextSteps: ['Préparer factsheets'],
-    meetings: [],
-    arbitrage: 'Sujets ? (cf. discussion Pauline)' },
-
-  { name: 'K-Connection Days', staffing: 'PB / GM', status: 'red',
-    nextSteps: ['Liste approuvée → envoyer Save The Dates ASAP'],
-    meetings: [],
-    arbitrage: null },
-
-  { name: 'Italie', staffing: 'PB / BF', status: 'green',
-    nextSteps: [],
-    meetings: [{ d: '20/05', t: 'Weekly interne' }],
-    arbitrage: null },
-
-  { name: 'Longévité', staffing: 'BF', status: 'green',
-    nextSteps: ['Contacter fonds une fois mapping fini (GM)'],
-    meetings: [
-      { d: '22/05', t: 'Bi-weekly w/ Christine' },
-      { d: '27/05', t: 'Bi-Weekly LDM (pre-read)' }
-    ],
-    arbitrage: null },
-
-  { name: 'Innovation', staffing: 'BB', status: 'green',
-    nextSteps: [],
-    meetings: [
-      { d: '12/05', t: 'McKinsey Workshop' },
-      { d: '20/05', t: 'Kering Ventures interne' },
-      { d: '20/05', t: 'Bi-weekly avec Pierre Houlès' },
-      { d: '27/05', t: 'Bi-Weekly LDM – Strat Inno' }
-    ],
-    arbitrage: 'Bouger le meeting McK chez nous ?' },
-
-  { name: 'Portefeuille', staffing: 'BCG', status: 'green',
-    nextSteps: [],
-    meetings: [{ d: '27/05', t: 'Bi-Weekly LDM (accélération SL / Boucheron)' }],
-    arbitrage: null },
-
-  { name: 'État du marché', staffing: '?', status: 'amber',
-    nextSteps: [],
-    meetings: [{ d: '27/05', t: 'Bi-Weekly LDM (présenter l\'état du marché)' }],
-    arbitrage: null },
-
-  { name: 'Anta × BAL Collab', staffing: '?', status: 'red',
-    nextSteps: ['Décider qui prend le lead (cf. FC1 meeting)'],
-    meetings: [],
-    arbitrage: 'Qui prend le lead ?' },
-
-  { name: 'Kering Art', staffing: '?', status: 'amber',
-    nextSteps: [],
-    meetings: [{ d: '27/05', t: 'Bi-Weekly LDM' }],
-    arbitrage: null },
-
-  { name: 'Middle East', staffing: 'PB', status: 'amber',
-    nextSteps: [],
-    meetings: [],
-    arbitrage: 'Quand présenter ?' },
-
-  { name: 'RH', staffing: 'DP / ELJ', status: 'green',
-    nextSteps: [],
-    meetings: [{ d: '20/05', t: 'Bi-weekly RH' }],
-    arbitrage: null },
-
-  { name: 'Demand Space Survey', staffing: 'BF', status: 'amber',
-    nextSteps: [],
-    meetings: [],
-    arbitrage: 'Caler les meetings ?' },
-
-  { name: 'Docent', staffing: 'BF', status: 'red',
-    nextSteps: ['Décider qui prend le lead (contrat signé)'],
-    meetings: [],
-    arbitrage: 'Qui prend le lead ?' },
-
-  { name: 'Refik', staffing: 'BF', status: 'amber',
-    nextSteps: [],
-    meetings: [],
-    arbitrage: 'Caler les meetings ?' },
-
-  { name: 'Brand Equity', staffing: 'BF', status: 'green',
-    nextSteps: ['Weekly à partir de juin'],
-    meetings: [],
-    arbitrage: null },
-
-  { name: 'CMI', staffing: '?', status: 'green',
-    nextSteps: ['Weekly Meetings w/ Jouve'],
-    meetings: [{ d: '13/05', t: 'Weekly Jouve' }],
-    arbitrage: null }
-];
-
-const PERSONAL = [
-  { name: 'Presse', status: 'green',
-    nextSteps: [],
-    meetings: [
-      { d: '13/05', t: 'Angelina R. (Bloomberg)' },
-      { d: '21/05', t: 'Laure G. (Vogue Business)' },
-      { d: '01/06', t: 'Virginie J. (Les Echos)' }
-    ],
-    arbitrage: null },
-
-  { name: 'Podcast', status: 'green',
-    nextSteps: [],
-    meetings: [{ d: '12/05', t: 'Verre Lou Dana' }],
-    arbitrage: null },
-
-  { name: 'Luxe Renaissance', status: 'amber',
-    nextSteps: ['Préparer intervention au Cercles Luxe Renaissance'],
-    meetings: [{ d: '02/06', t: 'Cercles Luxe Renaissance' }],
-    arbitrage: null },
-
-  { name: 'Dîner des Grands Amis', status: 'amber',
-    nextSteps: ['Décider qui inviter'],
-    meetings: [{ d: '11/06', t: 'Dîner des Grands Amis' }],
-    arbitrage: 'Liste d\'invitations à valider' },
-
-  { name: 'IFM', status: 'amber',
-    nextSteps: ['Fixer la date de l\'intervention (octobre / novembre)'],
-    meetings: [],
-    arbitrage: 'Inviter Xavier au board HoW ?' },
-
-  { name: 'Stages', status: 'green',
-    nextSteps: ['Bianca arrive début juin'],
-    meetings: [],
-    arbitrage: 'Retours sur la convention signée de Bianca ?' }
-];
-
-// Pour marquer 'prep: true' → un point ambre + tag "à préparer" s'affiche
-const GROUP_MEETINGS = [
-  {
-    date: '26 mai',
-    title: 'Operations Committee',
-    agenda: [
-      { time: '13:00–13:45', topic: 'Evolution of Performance Steering at Group level', owners: 'JM Duplaix · A. Poulou · J. Hazan · F. Ferrarini', prep: true },
-      { time: '13:45–14:15', topic: 'Forecast 1 (FC1) feedback', owners: 'JM Duplaix · A. Poulou', prep: false },
-      { time: '14:15–14:45', topic: 'Kering China Taskforce', owners: 'JM Duplaix · J. Hazan · B. Lazat', prep: true },
-      { time: '14:45–15:15', topic: 'Kering Efficiency status', owners: 'JM Duplaix · A. Poulou · B. Lazat', prep: false },
-      { time: '15:15–16:00', topic: 'Supply Chain transformation status', owners: 'S. Noel', prep: false }
-    ]
-  },
-  {
-    date: '27 mai',
-    title: 'Bi-Weekly Strat Meeting (LDM)',
-    agenda: [
-      { time: '', topic: 'Longevity', owners: 'B. Fassenot', prep: true },
-      { time: '', topic: 'Innovation Strategy', owners: 'B. Bouygues', prep: true },
-      { time: '', topic: 'Portefeuille — accélération SL / Boucheron', owners: '', prep: true },
-      { time: '', topic: 'État du marché', owners: '', prep: true },
-      { time: '', topic: 'Nouvelle gouvernance & suivi de la performance', owners: '', prep: true }
-    ]
+// ====== AUTH MODE ÉDITION ======
+document.getElementById('gear-btn').addEventListener('click', () => {
+  if (document.body.classList.contains('edit-mode')) {
+    document.body.classList.remove('edit-mode');
+    showToast('Mode édition désactivé');
+  } else {
+    if (sessionStorage.getItem('cockpit_edit_auth') === EDIT_PASSWORD) {
+      document.body.classList.add('edit-mode');
+      showToast('Mode édition activé');
+    } else {
+      openPwModal();
+    }
   }
-];
+});
 
-const BRAND_COMMITTEES = [
-  { d: '2 juin', t: 'Brand Committee SL' },
-  { d: '9 juin', t: 'Brand Committee Gucci' },
-  { d: '24 juin', t: 'Brand Committee Boucheron' }
-];
+function openPwModal() {
+  document.getElementById('pw-modal').classList.add('active');
+  setTimeout(() => document.getElementById('pw-input').focus(), 100);
+}
 
-// =====================================================
-// RENDU (ne pas modifier en dessous)
-// =====================================================
+window.closePwModal = () => {
+  document.getElementById('pw-modal').classList.remove('active');
+  document.getElementById('pw-input').value = '';
+  document.getElementById('pw-error').textContent = '';
+};
 
-function renderCard(item, idx, prefix) {
-  const hasBody = item.nextSteps.length > 0 || item.meetings.length > 0 || item.arbitrage;
-  const nextMeeting = item.meetings[0];
+window.submitPw = () => {
+  const val = document.getElementById('pw-input').value;
+  if (val === EDIT_PASSWORD) {
+    sessionStorage.setItem('cockpit_edit_auth', val);
+    document.body.classList.add('edit-mode');
+    window.closePwModal();
+    showToast('Mode édition activé');
+  } else {
+    document.getElementById('pw-error').textContent = 'Mot de passe incorrect';
+    document.getElementById('pw-input').value = '';
+  }
+};
+
+document.getElementById('pw-input').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') window.submitPw();
+});
+
+// ====== DATA SUBSCRIPTION ======
+const dataRef = ref(db, '/');
+onValue(dataRef, (snapshot) => {
+  const val = snapshot.val();
+  if (!val) {
+    DATA = { streams: {}, personal: {}, meetings: {}, committees: {} };
+  } else {
+    DATA.streams = val.streams || {};
+    DATA.personal = val.personal || {};
+    DATA.meetings = val.meetings || {};
+    DATA.committees = val.committees || {};
+    DATA.lastUpdate = val.lastUpdate || null;
+  }
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  setLive(true);
+  renderAll();
+}, (error) => {
+  showError("Connexion impossible", "Vérifiez les règles Firebase et la connexion internet.");
+  setLive(false);
+});
+
+window.addEventListener('online', () => setLive(true));
+window.addEventListener('offline', () => setLive(false));
+
+function setLive(online) {
+  const ind = document.getElementById('live-indicator');
+  const txt = document.getElementById('live-text');
+  if (!ind) return;
+  if (online) { ind.classList.remove('offline'); txt.textContent = 'Live'; }
+  else { ind.classList.add('offline'); txt.textContent = 'Offline'; }
+}
+
+function showError(title, msg) {
+  document.getElementById('loading').innerHTML = `<div class="error-screen"><div class="error-title">${title}</div><div class="error-msg">${msg}</div></div>`;
+}
+
+function showToast(text) {
+  const toast = document.getElementById('toast');
+  toast.textContent = text;
+  toast.classList.add('active');
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(() => toast.classList.remove('active'), 2000);
+}
+
+function escapeHtml(s) { return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function getItem(type, id) { return DATA[type] ? DATA[type][id] : null; }
+function getSubArray(obj) { return obj ? Object.entries(obj) : []; }
+
+// ====== RENDER ======
+function sortByDate(a, b) {
+  const pa = parseDateString(a.d);
+  const pb = parseDateString(b.d);
+  if (!pa) return 1;
+  if (!pb) return -1;
+  return pa - pb;
+}
+function parseDateString(s) {
+  if (!s) return null;
+  const m = s.match(/(\d{1,2})\/(\d{1,2})/);
+  if (!m) return null;
+  return new Date(2026, parseInt(m[2]) - 1, parseInt(m[1]));
+}
+
+const pencilSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+
+function renderCard(item, id, type) {
+  const nextSteps = getSubArray(item.nextSteps).map(([_, v]) => v);
+  const meetings = getSubArray(item.meetings).map(([_, v]) => v).sort(sortByDate);
+  const hasBody = nextSteps.length > 0 || meetings.length > 0 || item.arbitrage;
+  const next = meetings[0];
+  const cardId = `${type}-${id}`;
   return `
-    <article class="card" data-card="${prefix}-${idx}">
-      <header class="card-head" onclick="toggleCard('${prefix}-${idx}')">
-        <span class="dot ${item.status}"></span>
-        <span class="card-name">${item.name}</span>
-        ${item.staffing ? `<span class="staffing">${item.staffing}</span>` : ''}
+    <article class="card" data-card="${cardId}">
+      <button class="edit-pencil" onclick="window.openEdit('${type}', '${id}'); event.stopPropagation();" title="Modifier">${pencilSvg}</button>
+      <header class="card-head" onclick="window.toggleCard('${cardId}')">
+        <span class="dot ${item.status || 'green'}"></span>
+        <span class="card-name">${escapeHtml(item.name || 'Sans nom')}</span>
+        ${item.staffing ? `<span class="staffing">${escapeHtml(item.staffing)}</span>` : ''}
         ${hasBody ? '<span class="chevron"></span>' : ''}
       </header>
-      ${nextMeeting ? `<div class="card-meta">Prochain : <span class="date">${nextMeeting.d}</span> · ${nextMeeting.t}</div>` : (item.nextSteps.length > 0 ? `<div class="card-meta">${item.nextSteps.length} next step${item.nextSteps.length > 1 ? 's' : ''} en cours</div>` : (item.arbitrage ? `<div class="card-meta" style="color: var(--amber); font-weight: 500;">Arbitrage en attente</div>` : ''))}
+      ${next ? `<div class="card-meta">Prochain : <span class="date">${escapeHtml(next.d)}</span> · ${escapeHtml(next.t)}</div>` : (nextSteps.length > 0 ? `<div class="card-meta">${nextSteps.length} next step${nextSteps.length > 1 ? 's' : ''} en cours</div>` : (item.arbitrage ? `<div class="card-meta" style="color: var(--amber); font-weight: 500;">Arbitrage en attente</div>` : ''))}
       ${hasBody ? `
         <div class="card-body">
           <div class="card-body-inner">
-            ${item.nextSteps.length > 0 ? `
-              <div class="block">
-                <div class="block-label">Next steps</div>
-                <ul class="list">
-                  ${item.nextSteps.map(s => `<li>${s}</li>`).join('')}
-                </ul>
-              </div>
-            ` : ''}
-            ${item.meetings.length > 0 ? `
-              <div class="block">
-                <div class="block-label">Échéances</div>
-                <ul class="list dates">
-                  ${item.meetings.map(m => `<li><span class="date">${m.d}</span><span class="label">${m.t}</span></li>`).join('')}
-                </ul>
-              </div>
-            ` : ''}
-            ${item.arbitrage ? `
-              <div class="block">
-                <div class="block-label">Arbitrage JH</div>
-                <div class="arb-inline">${item.arbitrage}</div>
-              </div>
-            ` : ''}
+            ${nextSteps.length > 0 ? `<div class="block"><div class="block-label">Next steps</div><ul class="list">${nextSteps.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul></div>` : ''}
+            ${meetings.length > 0 ? `<div class="block"><div class="block-label">Échéances</div><ul class="list dates">${meetings.map(m => `<li><span class="date">${escapeHtml(m.d)}</span><span class="label">${escapeHtml(m.t)}</span></li>`).join('')}</ul></div>` : ''}
+            ${item.arbitrage ? `<div class="block"><div class="block-label">Arbitrage JH</div><div class="arb-inline">${escapeHtml(item.arbitrage)}</div></div>` : ''}
           </div>
         </div>
       ` : ''}
@@ -709,125 +479,413 @@ function renderCard(item, idx, prefix) {
 }
 
 function renderStreamsPanel() {
-  const sorted = [...STREAMS].sort((a, b) => {
+  const entries = Object.entries(DATA.streams);
+  const sorted = entries.sort((a, b) => {
     const order = { red: 0, amber: 1, green: 2 };
-    return order[a.status] - order[b.status];
+    return (order[a[1].status] ?? 3) - (order[b[1].status] ?? 3);
   });
-  const html = sorted.map((s, i) => renderCard(s, i, 'stream')).join('');
   document.getElementById('panel-streams').innerHTML = `
-    <div class="section-head">
-      <div class="section-title">Streams actifs</div>
-      <div class="section-count">${STREAMS.length} streams · triés par statut</div>
-    </div>
-    ${html}
+    <div class="section-head"><div class="section-title">Streams actifs</div><div class="section-count">${entries.length} streams · triés par statut</div></div>
+    ${sorted.map(([id, item]) => renderCard(item, id, 'streams')).join('') || '<div class="empty">Aucun stream pour l\'instant.</div>'}
+    <button class="add-btn" onclick="window.createNew('streams')">+ Ajouter un stream</button>
   `;
 }
 
 function renderPersonalPanel() {
-  const html = PERSONAL.map((s, i) => renderCard(s, i, 'perso')).join('');
+  const entries = Object.entries(DATA.personal);
   document.getElementById('panel-personal').innerHTML = `
-    <div class="section-head">
-      <div class="section-title">Sujets personnels</div>
-      <div class="section-count">Presse · Networking · Branding</div>
-    </div>
-    ${html}
+    <div class="section-head"><div class="section-title">Sujets personnels</div><div class="section-count">Presse · Networking · Branding</div></div>
+    ${entries.map(([id, item]) => renderCard(item, id, 'personal')).join('') || '<div class="empty">Aucun sujet pour l\'instant.</div>'}
+    <button class="add-btn" onclick="window.createNew('personal')">+ Ajouter un sujet</button>
   `;
 }
 
 function renderMeetingsPanel() {
-  const meetingsHtml = GROUP_MEETINGS.map(m => `
-    <div class="meeting-card featured">
-      <div class="meeting-head">
-        <div class="meeting-date-badge">${m.date}</div>
-        <div class="meeting-title-text">${m.title}</div>
-      </div>
-      ${m.agenda.map(a => `
-        <div class="agenda-item ${a.prep ? 'prep' : ''}">
-          <div class="agenda-row">
-            ${a.time ? `<div class="agenda-time">${a.time}</div>` : ''}
-            <div class="agenda-body">
-              <div class="agenda-topic">${a.topic}${a.prep ? '<span class="prep-flag">À préparer</span>' : ''}</div>
-              ${a.owners ? `<div class="agenda-owners">${a.owners}</div>` : ''}
+  const meetingsEntries = Object.entries(DATA.meetings);
+  const committeesEntries = Object.entries(DATA.committees);
+
+  const meetingsHtml = meetingsEntries.map(([id, m]) => {
+    const agenda = getSubArray(m.agenda).map(([_, v]) => v);
+    return `
+      <div class="meeting-card featured">
+        <button class="edit-pencil" onclick="window.openEdit('meetings', '${id}'); event.stopPropagation();" title="Modifier">${pencilSvg}</button>
+        <div class="meeting-head"><div class="meeting-date-badge">${escapeHtml(m.date || '')}</div><div class="meeting-title-text">${escapeHtml(m.title || '')}</div></div>
+        ${agenda.map(a => `
+          <div class="agenda-item ${a.prep ? 'prep' : ''}">
+            <div class="agenda-row">
+              ${a.time ? `<div class="agenda-time">${escapeHtml(a.time)}</div>` : ''}
+              <div class="agenda-body">
+                <div class="agenda-topic">${escapeHtml(a.topic || '')}${a.prep ? '<span class="prep-flag">À préparer</span>' : ''}</div>
+                ${a.owners ? `<div class="agenda-owners">${escapeHtml(a.owners)}</div>` : ''}
+              </div>
             </div>
           </div>
-        </div>
-      `).join('')}
-    </div>
-  `).join('');
+        `).join('')}
+      </div>
+    `;
+  }).join('');
 
-  const committeesHtml = BRAND_COMMITTEES.map(b => `
+  const committeesHtml = committeesEntries.map(([id, b]) => `
     <div class="timeline-item">
-      <div class="timeline-date-block">${b.d}</div>
-      <div class="timeline-label">${b.t}</div>
+      <button class="edit-pencil" onclick="window.openEdit('committees', '${id}'); event.stopPropagation();" title="Modifier">${pencilSvg}</button>
+      <div class="timeline-date-block">${escapeHtml(b.d || '')}</div>
+      <div class="timeline-label">${escapeHtml(b.t || '')}</div>
     </div>
   `).join('');
 
   document.getElementById('panel-meetings').innerHTML = `
-    <div class="section-head">
-      <div class="section-title">Group meetings</div>
-      <div class="section-count">Mai 2026</div>
-    </div>
-    ${meetingsHtml}
-    <div class="section-head">
-      <div class="section-title">Brand committees</div>
-      <div class="section-count">Juin 2026</div>
-    </div>
-    ${committeesHtml}
+    <div class="section-head"><div class="section-title">Group meetings</div><div class="section-count">${meetingsEntries.length} prévus</div></div>
+    ${meetingsHtml || '<div class="empty">Aucun meeting.</div>'}
+    <button class="add-btn" onclick="window.createNew('meetings')">+ Ajouter un meeting</button>
+    <div class="section-head"><div class="section-title">Brand committees</div><div class="section-count">${committeesEntries.length} prévus</div></div>
+    ${committeesHtml || '<div class="empty">Aucun committee.</div>'}
+    <button class="add-btn" onclick="window.createNew('committees')">+ Ajouter un brand committee</button>
   `;
 }
 
 function renderArbitragesPanel() {
   const all = [
-    ...STREAMS.filter(s => s.arbitrage).map(s => ({ ...s, source: 'Stream équipe' })),
-    ...PERSONAL.filter(s => s.arbitrage).map(s => ({ ...s, source: 'Sujet JH' }))
+    ...Object.entries(DATA.streams).filter(([_, s]) => s.arbitrage).map(([id, s]) => ({ id, type: 'streams', ...s, source: 'Stream équipe' })),
+    ...Object.entries(DATA.personal).filter(([_, s]) => s.arbitrage).map(([id, s]) => ({ id, type: 'personal', ...s, source: 'Sujet JH' }))
   ];
   document.getElementById('badge-arb').textContent = all.length;
-  if (all.length === 0) {
-    document.getElementById('panel-arbitrages').innerHTML = '<div class="empty">Aucun arbitrage en attente.</div>';
-    return;
-  }
-  document.getElementById('panel-arbitrages').innerHTML = `
-    <div class="section-head">
-      <div class="section-title">En attente de décision</div>
-      <div class="section-count">${all.length} arbitrage${all.length > 1 ? 's' : ''}</div>
-    </div>
+  document.getElementById('panel-arbitrages').innerHTML = all.length === 0 ? '<div class="empty">Aucun arbitrage en attente.</div>' : `
+    <div class="section-head"><div class="section-title">En attente de décision</div><div class="section-count">${all.length} arbitrage${all.length > 1 ? 's' : ''}</div></div>
     ${all.map(s => `
       <div class="arb-card">
-        <div class="arb-stream-name">${s.name} · ${s.source}</div>
-        <div class="arb-question">${s.arbitrage}</div>
+        <button class="edit-pencil" onclick="window.openEdit('${s.type}', '${s.id}'); event.stopPropagation();" title="Modifier">${pencilSvg}</button>
+        <div class="arb-stream-name">${escapeHtml(s.name)} · ${s.source}</div>
+        <div class="arb-question">${escapeHtml(s.arbitrage)}</div>
       </div>
     `).join('')}
   `;
 }
 
 function renderStats() {
-  const total = STREAMS.length;
-  const arbCount = STREAMS.filter(s => s.arbitrage).length + PERSONAL.filter(s => s.arbitrage).length;
-
-  // Échéances dans les 7 jours (parsing des dates au format JJ/MM)
-  const today = new Date(2026, 4, 11); // 11 mai 2026
-  const in7days = new Date(2026, 4, 18);
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const in7days = new Date(today);
+  in7days.setDate(in7days.getDate() + 7);
   let deadlineCount = 0;
-  [...STREAMS, ...PERSONAL].forEach(s => {
-    s.meetings.forEach(m => {
-      const match = m.d.match(/(\d{1,2})\/(\d{1,2})/);
-      if (match) {
-        const date = new Date(2026, parseInt(match[2]) - 1, parseInt(match[1]));
-        if (date >= today && date <= in7days) deadlineCount++;
-      }
+  [...Object.values(DATA.streams), ...Object.values(DATA.personal)].forEach(s => {
+    getSubArray(s.meetings).forEach(([_, m]) => {
+      const d = parseDateString(m.d);
+      if (d && d >= today && d <= in7days) deadlineCount++;
     });
   });
-
-  document.getElementById('stat-streams').textContent = total;
+  const arbCount = Object.values(DATA.streams).filter(s => s.arbitrage).length + Object.values(DATA.personal).filter(s => s.arbitrage).length;
+  document.getElementById('stat-streams').textContent = Object.keys(DATA.streams).length;
   document.getElementById('stat-deadlines').textContent = deadlineCount;
   document.getElementById('stat-arb').textContent = arbCount;
+  if (DATA.lastUpdate) {
+    const d = new Date(DATA.lastUpdate);
+    document.getElementById('last-update').textContent = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+  }
 }
 
-function toggleCard(id) {
+function renderAll() {
+  renderStats();
+  renderStreamsPanel();
+  renderPersonalPanel();
+  renderMeetingsPanel();
+  renderArbitragesPanel();
+}
+
+// ====== EDIT MODAL ======
+window.openEdit = (type, id) => {
+  currentEdit = { type, id };
+  const item = getItem(type, id);
+  if (!item) return;
+  const titleMap = { streams: 'Modifier le stream', personal: 'Modifier le sujet', meetings: 'Modifier le meeting', committees: 'Modifier le committee' };
+  document.getElementById('modal-title').textContent = titleMap[type];
+  refreshModalBody();
+  document.getElementById('modal-backdrop').classList.add('active');
+  document.getElementById('edit-modal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+};
+
+function refreshModalBody() {
+  if (!currentEdit) return;
+  const item = getItem(currentEdit.type, currentEdit.id);
+  if (!item) return;
+  document.getElementById('modal-body').innerHTML = renderEditForm(currentEdit.type, currentEdit.id, item);
+}
+
+function renderEditForm(type, id, item) {
+  if (type === 'meetings') return renderMeetingForm(id, item);
+  if (type === 'committees') return renderCommitteeForm(id, item);
+  return renderStreamForm(type, id, item);
+}
+
+function renderStreamForm(type, id, item) {
+  const nextSteps = getSubArray(item.nextSteps);
+  const meetings = getSubArray(item.meetings);
+  return `
+    <div class="field">
+      <label class="field-label">Nom</label>
+      <input type="text" value="${escapeHtml(item.name || '')}" oninput="window.saveField('${type}', '${id}', 'name', this.value)" placeholder="Nom du ${type === 'streams' ? 'stream' : 'sujet'}">
+    </div>
+    <div class="field">
+      <label class="field-label">Statut</label>
+      <div class="status-pills">
+        ${['green', 'amber', 'red'].map(s => `
+          <div class="status-pill ${item.status === s ? 'selected' : ''}" onclick="window.saveStatus('${type}', '${id}', '${s}')">
+            <span class="pill-dot ${s}"></span>
+            <span>${s === 'green' ? 'On track' : s === 'amber' ? 'À surveiller' : 'Bloqué'}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    ${type === 'streams' ? `
+      <div class="field">
+        <label class="field-label">Staffing</label>
+        <input type="text" value="${escapeHtml(item.staffing || '')}" oninput="window.saveField('${type}', '${id}', 'staffing', this.value)" placeholder="Ex: BF / PB">
+      </div>
+    ` : ''}
+    <div class="field">
+      <label class="field-label">Next steps</label>
+      <div class="subitems">
+        ${nextSteps.map(([nsId, ns]) => `
+          <div class="subitem">
+            <input type="text" value="${escapeHtml(ns || '')}" oninput="window.saveSubitem('${type}', '${id}', 'nextSteps', '${nsId}', this.value)" placeholder="Next step">
+            <button class="remove-btn" onclick="window.removeSubitem('${type}', '${id}', 'nextSteps', '${nsId}')">×</button>
+          </div>
+        `).join('')}
+      </div>
+      <button class="add-subitem" onclick="window.addSubitem('${type}', '${id}', 'nextSteps')">+ Ajouter</button>
+    </div>
+    <div class="field">
+      <label class="field-label">Échéances</label>
+      <div class="subitems">
+        ${meetings.map(([mId, m]) => `
+          <div class="subitem">
+            <input class="date-input" type="text" value="${escapeHtml(m.d || '')}" oninput="window.saveMeetingField('${type}', '${id}', '${mId}', 'd', this.value)" placeholder="JJ/MM">
+            <input type="text" value="${escapeHtml(m.t || '')}" oninput="window.saveMeetingField('${type}', '${id}', '${mId}', 't', this.value)" placeholder="Description">
+            <button class="remove-btn" onclick="window.removeSubitem('${type}', '${id}', 'meetings', '${mId}')">×</button>
+          </div>
+        `).join('')}
+      </div>
+      <button class="add-subitem" onclick="window.addMeetingToItem('${type}', '${id}')">+ Ajouter</button>
+    </div>
+    <div class="field">
+      <label class="field-label">Arbitrage JH (laisser vide si aucun)</label>
+      <textarea oninput="window.saveField('${type}', '${id}', 'arbitrage', this.value)" placeholder="Question en attente de décision...">${escapeHtml(item.arbitrage || '')}</textarea>
+    </div>
+  `;
+}
+
+function renderMeetingForm(id, item) {
+  const agenda = getSubArray(item.agenda);
+  return `
+    <div class="field">
+      <label class="field-label">Date</label>
+      <input type="text" value="${escapeHtml(item.date || '')}" oninput="window.saveField('meetings', '${id}', 'date', this.value)" placeholder="26 mai">
+    </div>
+    <div class="field">
+      <label class="field-label">Titre</label>
+      <input type="text" value="${escapeHtml(item.title || '')}" oninput="window.saveField('meetings', '${id}', 'title', this.value)" placeholder="Operations Committee">
+    </div>
+    <div class="field">
+      <label class="field-label">Agenda</label>
+      <div class="subitems">
+        ${agenda.map(([aId, a]) => `
+          <div class="subitem subitem-row-wrap">
+            <input class="time-input" type="text" value="${escapeHtml(a.time || '')}" oninput="window.saveAgenda('${id}', '${aId}', 'time', this.value)" placeholder="13:00–13:45">
+            <input type="text" value="${escapeHtml(a.topic || '')}" oninput="window.saveAgenda('${id}', '${aId}', 'topic', this.value)" placeholder="Sujet">
+            <button class="remove-btn" onclick="window.removeAgenda('${id}', '${aId}')">×</button>
+            <div class="meta-row">
+              <input type="text" value="${escapeHtml(a.owners || '')}" oninput="window.saveAgenda('${id}', '${aId}', 'owners', this.value)" placeholder="Owners">
+              <label class="checkbox-pill"><input type="checkbox" ${a.prep ? 'checked' : ''} onchange="window.saveAgenda('${id}', '${aId}', 'prep', this.checked)">À préparer</label>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <button class="add-subitem" onclick="window.addAgendaItem('${id}')">+ Point d'agenda</button>
+    </div>
+  `;
+}
+
+function renderCommitteeForm(id, item) {
+  return `
+    <div class="field">
+      <label class="field-label">Date</label>
+      <input type="text" value="${escapeHtml(item.d || '')}" oninput="window.saveField('committees', '${id}', 'd', this.value)" placeholder="2 juin">
+    </div>
+    <div class="field">
+      <label class="field-label">Titre</label>
+      <input type="text" value="${escapeHtml(item.t || '')}" oninput="window.saveField('committees', '${id}', 't', this.value)" placeholder="Brand Committee SL">
+    </div>
+  `;
+}
+
+window.closeModal = () => {
+  document.getElementById('modal-backdrop').classList.remove('active');
+  document.getElementById('edit-modal').classList.remove('active');
+  document.body.style.overflow = '';
+  currentEdit = null;
+};
+document.getElementById('modal-backdrop').addEventListener('click', window.closeModal);
+
+// ====== SAVE OPS ======
+async function saveToDb(path, value) {
+  try {
+    await set(ref(db, path), value);
+    await set(ref(db, 'lastUpdate'), new Date().toISOString());
+  } catch (e) {
+    showToast('Erreur de sauvegarde');
+    console.error(e);
+  }
+}
+
+function debouncedSave(path, value) {
+  clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => saveToDb(path, value), 400);
+}
+
+window.saveField = (type, id, field, value) => debouncedSave(`${type}/${id}/${field}`, value);
+window.saveSubitem = (type, id, subfield, subId, value) => debouncedSave(`${type}/${id}/${subfield}/${subId}`, value);
+window.saveMeetingField = (type, id, mId, field, value) => debouncedSave(`${type}/${id}/meetings/${mId}/${field}`, value);
+window.saveAgenda = (mId, aId, field, value) => debouncedSave(`meetings/${mId}/agenda/${aId}/${field}`, value);
+
+window.saveStatus = async (type, id, status) => {
+  await saveToDb(`${type}/${id}/status`, status);
+};
+
+window.removeSubitem = async (type, id, subfield, subId) => {
+  await remove(ref(db, `${type}/${id}/${subfield}/${subId}`));
+};
+
+window.addSubitem = async (type, id, subfield) => {
+  const newRef = push(ref(db, `${type}/${id}/${subfield}`));
+  await set(newRef, '');
+};
+
+window.addMeetingToItem = async (type, id) => {
+  const newRef = push(ref(db, `${type}/${id}/meetings`));
+  await set(newRef, { d: '', t: '' });
+};
+
+window.addAgendaItem = async (mId) => {
+  const newRef = push(ref(db, `meetings/${mId}/agenda`));
+  await set(newRef, { time: '', topic: '', owners: '', prep: false });
+};
+
+window.removeAgenda = async (mId, aId) => {
+  await remove(ref(db, `meetings/${mId}/agenda/${aId}`));
+};
+
+// ====== CREATE ======
+window.createNew = async (type) => {
+  let initial = {};
+  if (type === 'streams') initial = { name: 'Nouveau stream', status: 'green', staffing: '', arbitrage: '' };
+  else if (type === 'personal') initial = { name: 'Nouveau sujet', status: 'green', arbitrage: '' };
+  else if (type === 'meetings') initial = { date: '', title: 'Nouveau meeting' };
+  else if (type === 'committees') initial = { d: '', t: 'Nouveau committee' };
+
+  const newRef = push(ref(db, type));
+  await set(newRef, initial);
+  showToast('Créé');
+  setTimeout(() => window.openEdit(type, newRef.key), 300);
+};
+
+// ====== DELETE WITH CONFIRMATION ======
+window.askDelete = () => {
+  if (!currentEdit) return;
+  const item = getItem(currentEdit.type, currentEdit.id);
+  if (!item) return;
+  const name = item.name || item.title || item.t || 'cet élément';
+  askConfirm('Supprimer', `Voulez-vous vraiment supprimer « ${name} » ? Cette action est définitive.`, async () => {
+    await remove(ref(db, `${currentEdit.type}/${currentEdit.id}`));
+    window.closeModal();
+    showToast('Supprimé');
+  });
+};
+
+function askConfirm(title, msg, callback) {
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-msg').textContent = msg;
+  confirmCallback = callback;
+  document.getElementById('confirm-modal').classList.add('active');
+}
+
+window.cancelConfirm = () => {
+  document.getElementById('confirm-modal').classList.remove('active');
+  confirmCallback = null;
+};
+
+window.acceptConfirm = async () => {
+  if (confirmCallback) await confirmCallback();
+  document.getElementById('confirm-modal').classList.remove('active');
+  confirmCallback = null;
+};
+
+window.toggleCard = (id) => {
   const card = document.querySelector(`[data-card="${id}"]`);
   if (card) card.classList.toggle('open');
+};
+
+// Refresh modal when DATA updates (so add/remove subitems update the form)
+const originalRenderAll = renderAll;
+function renderAllAndRefreshModal() {
+  originalRenderAll();
+  if (currentEdit && document.getElementById('edit-modal').classList.contains('active')) {
+    // Only re-render modal body if structure changed (subitems count)
+    const item = getItem(currentEdit.type, currentEdit.id);
+    if (!item) {
+      window.closeModal();
+      return;
+    }
+    // Preserve focus
+    const focused = document.activeElement;
+    const focusedSelector = focused && focused.tagName === 'INPUT' || focused.tagName === 'TEXTAREA';
+    if (!focusedSelector) {
+      refreshModalBody();
+    } else {
+      // Check if we need to refresh structure (add/remove)
+      const currentSubitems = document.querySelectorAll('#modal-body .subitem').length;
+      const expectedSubitems = countSubitems(currentEdit.type, currentEdit.id, item);
+      if (currentSubitems !== expectedSubitems) {
+        refreshModalBody();
+      } else {
+        // Update only status pills
+        updateStatusPills(item);
+      }
+    }
+  }
 }
 
+function countSubitems(type, id, item) {
+  if (type === 'meetings') return getSubArray(item.agenda).length;
+  if (type === 'committees') return 0;
+  return getSubArray(item.nextSteps).length + getSubArray(item.meetings).length;
+}
+
+function updateStatusPills(item) {
+  const pills = document.querySelectorAll('#modal-body .status-pill');
+  if (pills.length === 0) return;
+  const statuses = ['green', 'amber', 'red'];
+  pills.forEach((p, i) => {
+    if (statuses[i] === item.status) p.classList.add('selected');
+    else p.classList.remove('selected');
+  });
+}
+
+// Override the onValue callback to use renderAllAndRefreshModal
+onValue(dataRef, (snapshot) => {
+  const val = snapshot.val();
+  if (!val) {
+    DATA = { streams: {}, personal: {}, meetings: {}, committees: {} };
+  } else {
+    DATA.streams = val.streams || {};
+    DATA.personal = val.personal || {};
+    DATA.meetings = val.meetings || {};
+    DATA.committees = val.committees || {};
+    DATA.lastUpdate = val.lastUpdate || null;
+  }
+  renderAllAndRefreshModal();
+});
+
+// Tabs
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -837,12 +895,6 @@ document.querySelectorAll('.tab').forEach(tab => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 });
-
-renderStats();
-renderStreamsPanel();
-renderPersonalPanel();
-renderMeetingsPanel();
-renderArbitragesPanel();
 </script>
 
 </body>
