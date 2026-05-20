@@ -524,8 +524,18 @@ onValue(rootRef, snap => {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('app').style.display = 'block';
   setLive(true);
-  renderAll();
-  if (currentEdit && document.getElementById('edit-modal').classList.contains('active')) {
+
+  // Si l'utilisateur est en train de taper dans la modale, on ne re-render PAS l'arrière-plan
+  // (sinon ça peut interrompre la saisie via des side-effects DOM)
+  const activeEl = document.activeElement;
+  const modalOpen = document.getElementById('edit-modal').classList.contains('active');
+  const isTypingInModal = modalOpen && activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA') && document.getElementById('edit-modal').contains(activeEl);
+
+  if (!isTypingInModal) {
+    renderAll();
+  }
+
+  if (currentEdit && modalOpen) {
     refreshModal();
   }
 }, () => setLive(false));
@@ -893,6 +903,18 @@ document.getElementById('modal-backdrop').addEventListener('click', window.close
 
 function refreshModal() {
   if (!currentEdit) return;
+
+  // Si l'utilisateur est en train de taper dans un input/textarea de la modale, on ne re-render pas
+  const activeEl = document.activeElement;
+  const isTypingInModal = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA') && document.getElementById('edit-modal').contains(activeEl);
+
+  if (isTypingInModal) {
+    // On met à jour uniquement les status pills (sélection visuelle) sans toucher au reste
+    updateStatusPillsInModal();
+    return;
+  }
+
+  // Sinon on re-render normalement
   const { type, id, subId } = currentEdit;
   if (type === 'substream') {
     const item = DATA.streams[id]?.substreams?.[subId];
@@ -910,6 +932,21 @@ function refreshModal() {
     const item = DATA.committees[id];
     if (item) document.getElementById('modal-body').innerHTML = buildCommitteeForm(id, item);
   }
+}
+
+function updateStatusPillsInModal() {
+  if (!currentEdit) return;
+  const { type, id, subId } = currentEdit;
+  let item = null;
+  if (type === 'substream') item = DATA.streams[id]?.substreams?.[subId];
+  else if (type === 'stream') item = DATA.streams[id];
+  else if (type === 'personal') item = DATA.personal[id];
+  if (!item) return;
+  const currentStatus = item.status || 'green';
+  document.querySelectorAll('#modal-body .status-pill').forEach((pill, i) => {
+    const statusVal = ['green','amber','red'][i];
+    pill.classList.toggle('selected', currentStatus === statusVal);
+  });
 }
 
 // ====== FORMS ======
