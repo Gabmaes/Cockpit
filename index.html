@@ -190,7 +190,28 @@ body.edit-mode .add-substream-btn{display:block}
 .agenda-body{flex:1}
 .agenda-topic{font-size:13px;font-weight:500;line-height:1.4;color:var(--ink)}
 .agenda-owners{font-size:11px;color:var(--ink-mute);margin-top:3px;line-height:1.35}
-.prep-flag{display:inline-block;font-size:9.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:var(--amber-bg);color:var(--amber);padding:2px 6px;border-radius:4px;margin-left:6px;vertical-align:middle}
+.prep-flag{display:inline-block;font-size:9.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:4px;margin-left:6px;vertical-align:middle}
+.prep-flag-amber{background:var(--amber-bg);color:var(--amber)}
+.prep-flag-blue{background:var(--blue-bg);color:var(--blue)}
+.prep-flag-green{background:var(--green-bg);color:var(--green)}
+.meeting-card{position:relative}
+.meeting-card.dragging{opacity:.5;border-style:dashed}
+.meeting-card.drag-over{border-color:var(--ink);box-shadow:0 0 0 2px var(--ink)}
+.drag-handle-meeting{display:none;cursor:grab;color:var(--ink-mute);width:20px;height:20px;align-items:center;justify-content:center;touch-action:none;margin-right:4px;flex-shrink:0}
+.drag-handle-meeting:active{cursor:grabbing}
+body.edit-mode .drag-handle-meeting{display:inline-flex}
+body.edit-mode .meeting-head{padding-right:50px}
+body.edit-mode .timeline-item{padding-right:50px}
+.meeting-arb{margin-top:10px;padding-top:12px;border-top:.5px solid var(--line);background:var(--amber-bg);margin-left:-16px;margin-right:-16px;margin-bottom:-16px;padding:12px 16px 16px;border-radius:0 0 14px 14px}
+.meeting-arb-label{font-size:10px;font-weight:600;color:var(--amber);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.meeting-arb-text{font-size:13px;color:var(--ink);line-height:1.45;font-weight:500}
+.meetings-list{position:relative}
+.prep-pill{flex:1;padding:7px 6px;border:.5px solid var(--line-strong);border-radius:7px;background:var(--bg-card);font-family:inherit;font-size:11px;font-weight:500;color:var(--ink-soft);cursor:pointer;transition:all .12s;text-align:center;white-space:nowrap}
+.prep-pill:hover{color:var(--ink)}
+.prep-pill.selected{border-color:var(--ink);background:var(--bg-soft);color:var(--ink)}
+.prep-pill.prep-pill-amber.selected{border-color:var(--amber);background:var(--amber-bg);color:var(--amber)}
+.prep-pill.prep-pill-blue.selected{border-color:var(--blue);background:var(--blue-bg);color:var(--blue)}
+.prep-pill.prep-pill-green.selected{border-color:var(--green);background:var(--green-bg);color:var(--green)}
 .agenda-item.prep .agenda-topic::before{content:'';display:inline-block;width:3px;height:3px;background:var(--amber);border-radius:50%;margin-right:6px;vertical-align:middle;margin-bottom:2px}
 .timeline-item{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg-card);border:.5px solid var(--line);border-radius:12px;margin-bottom:6px;position:relative}
 .timeline-date-block{font-family:'Fraunces',serif;font-size:18px;font-weight:500;color:var(--ink);min-width:56px}
@@ -347,7 +368,7 @@ body.edit-mode .arb-card{padding-right:50px}
   <nav class="tabs">
     <button class="tab active" data-tab="streams">Streams équipe</button>
     <button class="tab" data-tab="personal">Sujets JH</button>
-    <button class="tab" data-tab="meetings">Group meetings</button>
+    <button class="tab" data-tab="meetings">Upcoming Meetings</button>
     <button class="tab" data-tab="arbitrages">Arbitrages <span class="badge" id="badge-arb">0</span></button>
   </nav>
 
@@ -454,7 +475,7 @@ const EDIT_PASSWORD = "kering2026";
 const fbApp = initializeApp(firebaseConfig);
 const db = getDatabase(fbApp);
 
-let DATA = { streams: {}, personal: {}, meetings: {}, committees: {} };
+let DATA = { streams: {}, personal: {}, meetings: {}, internalMeetings: {}, committees: {} };
 let currentEdit = null; // { type, id, subId? }
 let confirmCallback = null;
 let saveTimeout = null;
@@ -518,8 +539,12 @@ onValue(rootRef, snap => {
   DATA.streams = v.streams || {};
   DATA.personal = v.personal || {};
   DATA.meetings = v.meetings || {};
+  DATA.internalMeetings = v.internalMeetings || {};
   DATA.committees = v.committees || {};
   DATA.streamOrder = v.streamOrder || null;
+  DATA.meetingsOrder = v.meetingsOrder || null;
+  DATA.internalMeetingsOrder = v.internalMeetingsOrder || null;
+  DATA.committeesOrder = v.committeesOrder || null;
   DATA.lastUpdate = v.lastUpdate || null;
   document.getElementById('loading').style.display = 'none';
   document.getElementById('app').style.display = 'block';
@@ -730,33 +755,90 @@ function renderPersonalPanel() {
     <button class="add-btn" onclick="window.createNewPersonal()">+ Ajouter un sujet</button>`;
 }
 
-function renderMeetingsPanel() {
-  const mEntries = objArr(DATA.meetings);
-  const cEntries = objArr(DATA.committees);
-  const meetingsHtml = mEntries.map(([id,m]) => {
-    const agenda = objVals(m.agenda||{});
-    return `<div class="meeting-card">
-      <button class="edit-pencil" onclick="window.openEditMeeting('${id}');event.stopPropagation()">${pencilSVG}</button>
-      <div class="meeting-head"><div class="meeting-date-badge">${esc(m.date||'')}</div><div class="meeting-title-text">${esc(m.title||'')}</div></div>
-      ${agenda.map(a=>`<div class="agenda-item ${a.prep?'prep':''}"><div class="agenda-row">
+// Helpers pour ordres des meetings
+function getOrderedMeetings(key) {
+  // key: 'meetings' | 'internalMeetings' | 'committees'
+  const data = DATA[key] || {};
+  const entries = Object.entries(data);
+  const orderKey = key + 'Order';
+  const order = DATA[orderKey];
+  if (order && Array.isArray(order)) {
+    const ordered = [];
+    order.forEach(id => { if (data[id]) ordered.push([id, data[id]]); });
+    entries.forEach(([id, item]) => { if (!order.includes(id)) ordered.push([id, item]); });
+    return ordered;
+  }
+  return entries;
+}
+
+const PREP_STATUS_LABELS = {
+  'todo': 'À préparer',
+  'in-progress': 'En cours',
+  'done': 'Fait'
+};
+const PREP_STATUS_COLORS = {
+  'todo': 'amber',
+  'in-progress': 'blue',
+  'done': 'green'
+};
+
+function renderMeetingCard(id, m, dataKey) {
+  const agenda = objVals(m.agenda||{});
+  return `<div class="meeting-card" data-meetingid="${id}" data-mkey="${dataKey}">
+    <button class="edit-pencil" onclick="window.openEditMeeting('${id}','${dataKey}');event.stopPropagation()">${pencilSVG}</button>
+    <div class="meeting-head">
+      <span class="drag-handle drag-handle-meeting" title="Réordonner">${dragSVG}</span>
+      <div class="meeting-date-badge">${esc(m.date||'')}</div>
+      <div class="meeting-title-text">${esc(m.title||'')}</div>
+    </div>
+    ${agenda.map(a => {
+      const prepStatus = a.prepStatus || (a.prep ? 'todo' : null);
+      let prepFlag = '';
+      if (prepStatus) {
+        const lbl = PREP_STATUS_LABELS[prepStatus];
+        const col = PREP_STATUS_COLORS[prepStatus];
+        prepFlag = `<span class="prep-flag prep-flag-${col}">${lbl}</span>`;
+      }
+      return `<div class="agenda-item ${prepStatus==='todo'?'prep':''}"><div class="agenda-row">
         ${a.time?`<div class="agenda-time">${esc(a.time)}</div>`:''}
-        <div class="agenda-body"><div class="agenda-topic">${esc(a.topic||'')}${a.prep?'<span class="prep-flag">À préparer</span>':''}</div>
-        ${a.owners?`<div class="agenda-owners">${esc(a.owners)}</div>`:''}</div>
-      </div></div>`).join('')}
-    </div>`;
-  }).join('');
-  const committeeHtml = cEntries.map(([id,b])=>`<div class="timeline-item">
+        <div class="agenda-body">
+          <div class="agenda-topic">${esc(a.topic||'')}${prepFlag}</div>
+          ${a.owners?`<div class="agenda-owners">${esc(a.owners)}</div>`:''}
+        </div>
+      </div></div>`;
+    }).join('')}
+    ${m.arbitrage ? `<div class="meeting-arb"><div class="meeting-arb-label">Arbitrage JH</div><div class="meeting-arb-text">${esc(m.arbitrage)}</div></div>` : ''}
+  </div>`;
+}
+
+function renderMeetingsPanel() {
+  const groupOrdered = getOrderedMeetings('meetings');
+  const internalOrdered = getOrderedMeetings('internalMeetings');
+  const committeesOrdered = getOrderedMeetings('committees');
+
+  const groupHtml = groupOrdered.map(([id,m]) => renderMeetingCard(id, m, 'meetings')).join('');
+  const internalHtml = internalOrdered.map(([id,m]) => renderMeetingCard(id, m, 'internalMeetings')).join('');
+  const committeesHtml = committeesOrdered.map(([id,b])=>`<div class="timeline-item" data-meetingid="${id}" data-mkey="committees">
+    <span class="drag-handle drag-handle-meeting" title="Réordonner">${dragSVG}</span>
     <button class="edit-pencil" onclick="window.openEditCommittee('${id}');event.stopPropagation()">${pencilSVG}</button>
     <div class="timeline-date-block">${esc(b.d||'')}</div>
     <div class="timeline-label">${esc(b.t||'')}</div>
   </div>`).join('');
+
   document.getElementById('panel-meetings').innerHTML = `
-    <div class="section-head"><div class="section-title">Group meetings</div><div class="section-count">${mEntries.length} prévus</div></div>
-    ${meetingsHtml||'<div class="empty">Aucun meeting.</div>'}
-    <button class="add-btn" onclick="window.createNewMeeting()">+ Ajouter un meeting</button>
-    <div class="section-head"><div class="section-title">Brand committees</div><div class="section-count">${cEntries.length} prévus</div></div>
-    ${committeeHtml||'<div class="empty">Aucun committee.</div>'}
+    <div class="section-head"><div class="section-title">Group meetings</div><div class="section-count">${groupOrdered.length} prévus</div></div>
+    <div class="meetings-list" data-mkey="meetings">${groupHtml||'<div class="empty">Aucun meeting.</div>'}</div>
+    <button class="add-btn" onclick="window.createNewMeeting('meetings')">+ Ajouter un Group meeting</button>
+
+    <div class="section-head"><div class="section-title">Internal meetings</div><div class="section-count">${internalOrdered.length} prévus</div></div>
+    <div class="meetings-list" data-mkey="internalMeetings">${internalHtml||'<div class="empty">Aucun meeting interne.</div>'}</div>
+    <button class="add-btn" onclick="window.createNewMeeting('internalMeetings')">+ Ajouter un Internal meeting</button>
+
+    <div class="section-head"><div class="section-title">Brand committees</div><div class="section-count">${committeesOrdered.length} prévus</div></div>
+    <div class="meetings-list" data-mkey="committees">${committeesHtml||'<div class="empty">Aucun committee.</div>'}</div>
     <button class="add-btn" onclick="window.createNewCommittee()">+ Ajouter un brand committee</button>`;
+
+  initMeetingsDragDrop();
 }
 
 function renderArbitragesPanel() {
@@ -771,14 +853,27 @@ function renderArbitragesPanel() {
   objArr(DATA.personal).forEach(([id,s]) => {
     if (s.arbitrage) all.push({name:s.name, arb:s.arbitrage, type:'personal', id});
   });
+  // Arbitrages des meetings (group + internal)
+  objArr(DATA.meetings).forEach(([id,m]) => {
+    if (m.arbitrage) all.push({name:`${m.date||'Meeting'} · ${m.title||''}`, arb:m.arbitrage, type:'meeting', id, dataKey:'meetings'});
+  });
+  objArr(DATA.internalMeetings).forEach(([id,m]) => {
+    if (m.arbitrage) all.push({name:`${m.date||'Internal'} · ${m.title||''}`, arb:m.arbitrage, type:'meeting', id, dataKey:'internalMeetings'});
+  });
   document.getElementById('badge-arb').textContent = all.length;
   document.getElementById('panel-arbitrages').innerHTML = all.length===0 ? '<div class="empty">Aucun arbitrage en attente.</div>' : `
     <div class="section-head"><div class="section-title">En attente de décision</div><div class="section-count">${all.length} arbitrage${all.length>1?'s':''}</div></div>
-    ${all.map(a=>`<div class="arb-card">
-      <button class="edit-pencil" onclick="${a.type==='substream'?`window.openEditSubstream('${a.streamId}','${a.subId}')`:`window.openEdit('${a.type}','${a.id}')`};event.stopPropagation()">${pencilSVG}</button>
-      <div class="arb-stream-name">${esc(a.name)}</div>
-      <div class="arb-question">${esc(a.arb)}</div>
-    </div>`).join('')}`;
+    ${all.map(a=>{
+      let onClick;
+      if (a.type==='substream') onClick = `window.openEditSubstream('${a.streamId}','${a.subId}')`;
+      else if (a.type==='meeting') onClick = `window.openEditMeeting('${a.id}','${a.dataKey}')`;
+      else onClick = `window.openEdit('${a.type}','${a.id}')`;
+      return `<div class="arb-card">
+        <button class="edit-pencil" onclick="${onClick};event.stopPropagation()">${pencilSVG}</button>
+        <div class="arb-stream-name">${esc(a.name)}</div>
+        <div class="arb-question">${esc(a.arb)}</div>
+      </div>`;
+    }).join('')}`;
 }
 
 function renderStats() {
@@ -886,6 +981,67 @@ function initDragDrop() {
   document.addEventListener('touchend', endDrag);
 }
 
+// Drag & drop pour les 3 listes de meetings (group, internal, committees)
+function initMeetingsDragDrop() {
+  document.querySelectorAll('.meetings-list').forEach(list => {
+    const mKey = list.dataset.mkey; // 'meetings', 'internalMeetings', 'committees'
+    if (!mKey) return;
+    const itemSelector = mKey === 'committees' ? '.timeline-item' : '.meeting-card';
+    let dragEl = null, placeholder = null, startY = 0, startScrollY = 0;
+
+    list.querySelectorAll(itemSelector).forEach(card => {
+      const handle = card.querySelector('.drag-handle-meeting');
+      if (!handle) return;
+
+      const startDrag = (clientY) => {
+        if (!document.body.classList.contains('edit-mode')) return;
+        dragEl = card;
+        startY = clientY;
+        startScrollY = window.scrollY;
+        card.classList.add('dragging');
+        placeholder = document.createElement('div');
+        placeholder.className = 'drag-placeholder';
+        placeholder.style.height = card.offsetHeight + 'px';
+        placeholder.style.marginBottom = '12px';
+        card.after(placeholder);
+      };
+
+      handle.addEventListener('mousedown', e => { e.preventDefault(); startDrag(e.clientY); });
+      handle.addEventListener('touchstart', e => { startDrag(e.touches[0].clientY); }, {passive:true});
+    });
+
+    const onMove = (clientY) => {
+      if (!dragEl) return;
+      const dy = clientY - startY + (window.scrollY - startScrollY);
+      dragEl.style.transform = `translateY(${dy}px)`;
+      const cards = [...list.querySelectorAll(`${itemSelector}:not(.dragging)`)];
+      let insertBefore = null;
+      for (const c of cards) {
+        const r = c.getBoundingClientRect();
+        if (clientY < r.top + r.height/2) { insertBefore = c; break; }
+      }
+      if (insertBefore) list.insertBefore(placeholder, insertBefore);
+      else list.appendChild(placeholder);
+    };
+
+    const endDrag = () => {
+      if (!dragEl) return;
+      dragEl.style.transform = '';
+      dragEl.classList.remove('dragging');
+      if (placeholder) list.insertBefore(dragEl, placeholder);
+      placeholder?.remove(); placeholder = null;
+      const newOrder = [...list.querySelectorAll(itemSelector)].map(c => c.dataset.meetingid).filter(Boolean);
+      save(mKey + 'Order', newOrder);
+      dragEl = null;
+    };
+
+    document.addEventListener('mousemove', e => onMove(e.clientY));
+    document.addEventListener('touchmove', e => onMove(e.touches[0].clientY), {passive:true});
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchend', endDrag);
+  });
+}
+
 // ====== EDIT MODAL ======
 function openModal(title) {
   document.getElementById('modal-title').textContent = title;
@@ -926,8 +1082,9 @@ function refreshModal() {
     const item = DATA.personal[id];
     if (item) document.getElementById('modal-body').innerHTML = buildPersonalForm(id, item);
   } else if (type === 'meeting') {
-    const item = DATA.meetings[id];
-    if (item) document.getElementById('modal-body').innerHTML = buildMeetingForm(id, item);
+    const dataKey = currentEdit.dataKey || 'meetings';
+    const item = DATA[dataKey]?.[id];
+    if (item) document.getElementById('modal-body').innerHTML = buildMeetingForm(id, item, dataKey);
   } else if (type === 'committee') {
     const item = DATA.committees[id];
     if (item) document.getElementById('modal-body').innerHTML = buildCommitteeForm(id, item);
@@ -1040,25 +1197,40 @@ function buildPersonalForm(id, item) {
     </div>`;
 }
 
-function buildMeetingForm(id, item) {
+function buildMeetingForm(id, item, dataKey) {
+  dataKey = dataKey || 'meetings';
   const agenda = objArr(item.agenda||{});
+  const base = `${dataKey}/${id}`;
   return `
     <div class="field"><label class="field-label">Date</label>
-      <input type="text" value="${esc(item.date||'')}" oninput="window.dSavePath('meetings/${id}/date',this.value)" placeholder="26 mai"></div>
+      <input type="text" value="${esc(item.date||'')}" oninput="window.dSavePath('${base}/date',this.value)" placeholder="26 mai"></div>
     <div class="field"><label class="field-label">Titre</label>
-      <input type="text" value="${esc(item.title||'')}" oninput="window.dSavePath('meetings/${id}/title',this.value)" placeholder="Operations Committee"></div>
+      <input type="text" value="${esc(item.title||'')}" oninput="window.dSavePath('${base}/title',this.value)" placeholder="Operations Committee"></div>
     <div class="field"><label class="field-label">Agenda</label>
-      <div class="subitems">${agenda.map(([aid,a])=>`
+      <div class="subitems">${agenda.map(([aid,a])=>{
+        const prepStatus = a.prepStatus || (a.prep ? 'todo' : '');
+        return `
         <div class="subitem subitem-row-wrap">
-          <input type="text" value="${esc(a.time||'')}" oninput="window.dSavePath('meetings/${id}/agenda/${aid}/time',this.value)" placeholder="13:00–14:00" style="flex:0 0 110px">
-          <input type="text" value="${esc(a.topic||'')}" oninput="window.dSavePath('meetings/${id}/agenda/${aid}/topic',this.value)" placeholder="Sujet">
-          <button class="remove-btn" onclick="window.rmPath('meetings/${id}/agenda/${aid}')">×</button>
+          <input type="text" value="${esc(a.time||'')}" oninput="window.dSavePath('${base}/agenda/${aid}/time',this.value)" placeholder="13:00–14:00" style="flex:0 0 110px">
+          <input type="text" value="${esc(a.topic||'')}" oninput="window.dSavePath('${base}/agenda/${aid}/topic',this.value)" placeholder="Sujet">
+          <button class="remove-btn" onclick="window.rmPath('${base}/agenda/${aid}')">×</button>
           <div class="meta-row">
-            <input type="text" value="${esc(a.owners||'')}" oninput="window.dSavePath('meetings/${id}/agenda/${aid}/owners',this.value)" placeholder="Owners">
-            <label class="checkbox-pill"><input type="checkbox" ${a.prep?'checked':''} onchange="window.dSavePath('meetings/${id}/agenda/${aid}/prep',this.checked)">À préparer</label>
+            <input type="text" value="${esc(a.owners||'')}" oninput="window.dSavePath('${base}/agenda/${aid}/owners',this.value)" placeholder="Owners">
           </div>
-        </div>`).join('')}</div>
-      <button class="add-subitem" onclick="window.addObjToPath('meetings/${id}/agenda',{time:'',topic:'',owners:'',prep:false})">+ Point d'agenda</button></div>`;
+          <div class="meta-row" style="margin-top:6px">
+            <label style="font-size:10px;color:var(--ink-mute);font-weight:600;letter-spacing:.06em;text-transform:uppercase;flex-basis:100%;margin-bottom:4px;display:block">Pre-read à préparer</label>
+            <div class="prep-pills" style="display:flex;gap:4px;flex:1">
+              <button class="prep-pill ${!prepStatus?'selected':''}" onclick="window.dSavePath('${base}/agenda/${aid}/prepStatus',null)">Aucun</button>
+              <button class="prep-pill prep-pill-amber ${prepStatus==='todo'?'selected':''}" onclick="window.dSavePath('${base}/agenda/${aid}/prepStatus','todo')">À préparer</button>
+              <button class="prep-pill prep-pill-blue ${prepStatus==='in-progress'?'selected':''}" onclick="window.dSavePath('${base}/agenda/${aid}/prepStatus','in-progress')">En cours</button>
+              <button class="prep-pill prep-pill-green ${prepStatus==='done'?'selected':''}" onclick="window.dSavePath('${base}/agenda/${aid}/prepStatus','done')">Fait</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}</div>
+      <button class="add-subitem" onclick="window.addObjToPath('${base}/agenda',{time:'',topic:'',owners:''})">+ Point d'agenda</button></div>
+    <div class="field"><label class="field-label">Arbitrage JH (laisser vide si aucun)</label>
+      <textarea oninput="window.dSavePath('${base}/arbitrage',this.value||null)" placeholder="Question en attente de décision…">${esc(item.arbitrage||'')}</textarea></div>`;
 }
 
 function buildCommitteeForm(id, item) {
@@ -1086,10 +1258,12 @@ window.openEditPersonal = (id) => {
   openModal('Modifier le sujet');
   document.getElementById('modal-body').innerHTML = buildPersonalForm(id, DATA.personal[id]||{});
 };
-window.openEditMeeting = (id) => {
-  currentEdit = {type:'meeting', id};
-  openModal('Modifier le meeting');
-  document.getElementById('modal-body').innerHTML = buildMeetingForm(id, DATA.meetings[id]||{});
+window.openEditMeeting = (id, dataKey) => {
+  dataKey = dataKey || 'meetings';
+  currentEdit = {type:'meeting', id, dataKey};
+  const title = dataKey === 'internalMeetings' ? 'Modifier l\'internal meeting' : 'Modifier le meeting';
+  openModal(title);
+  document.getElementById('modal-body').innerHTML = buildMeetingForm(id, DATA[dataKey]?.[id]||{}, dataKey);
 };
 window.openEditCommittee = (id) => {
   currentEdit = {type:'committee', id};
@@ -1146,11 +1320,12 @@ window.createNewPersonal = async () => {
   showToast('Sujet créé');
   setTimeout(() => window.openEditPersonal(nr.key), 300);
 };
-window.createNewMeeting = async () => {
-  const nr = push(ref(db, 'meetings'));
+window.createNewMeeting = async (dataKey) => {
+  dataKey = dataKey || 'meetings';
+  const nr = push(ref(db, dataKey));
   await set(nr, {date:'', title:'Nouveau meeting'});
   showToast('Meeting créé');
-  setTimeout(() => window.openEditMeeting(nr.key), 300);
+  setTimeout(() => window.openEditMeeting(nr.key, dataKey), 300);
 };
 window.createNewCommittee = async () => {
   const nr = push(ref(db, 'committees'));
@@ -1162,19 +1337,20 @@ window.createNewCommittee = async () => {
 // ====== DELETE ======
 window.askDelete = () => {
   if (!currentEdit) return;
-  const { type, id, subId } = currentEdit;
+  const { type, id, subId, dataKey } = currentEdit;
+  const mKey = dataKey || 'meetings';
   let name = 'cet élément';
   if (type==='substream') name = DATA.streams[id]?.substreams?.[subId]?.name || name;
   else if (type==='stream') name = DATA.streams[id]?.name || name;
   else if (type==='personal') name = DATA.personal[id]?.name || name;
-  else if (type==='meeting') name = DATA.meetings[id]?.title || name;
+  else if (type==='meeting') name = DATA[mKey]?.[id]?.title || name;
   else if (type==='committee') name = DATA.committees[id]?.t || name;
   askConfirm('Supprimer', `Voulez-vous vraiment supprimer « ${name} » ? Cette action est définitive.`, async () => {
     let path = '';
     if (type==='substream') path = `streams/${id}/substreams/${subId}`;
     else if (type==='stream') path = `streams/${id}`;
     else if (type==='personal') path = `personal/${id}`;
-    else if (type==='meeting') path = `meetings/${id}`;
+    else if (type==='meeting') path = `${mKey}/${id}`;
     else if (type==='committee') path = `committees/${id}`;
     await remove(ref(db, path));
     window.closeModal(); showToast('Supprimé');
